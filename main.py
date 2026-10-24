@@ -92,14 +92,13 @@ plt.xlim(-2, 2)
 plt.ylim(-2, 2)
 
 def update(frame):
-    theta2_new = np.deg2rad(-45 + frame)
+    t = frame /90    
+    t = 3 * t**2 - 2 * t**3
 
-    x1, y1, x2, y2 = forward_kinematics(
-        theta1, theta2_new, L1, L2
-    )
-
+    theta1_new = theta1 + t * (theta1_ik - theta1)
+    theta2_new = theta2 + t * (theta2_ik - theta2)
+    x1, y1, x2, y2 = forward_kinematics(theta1_new, theta2_new, L1, L2)
     line.set_data([0, x1, x2], [0, y1, y2])
-
     return line,
 
 ani = FuncAnimation(

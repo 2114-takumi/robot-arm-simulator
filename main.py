@@ -18,6 +18,31 @@ def forward_kinematics(theta1, theta2, L1, L2):
 
     return x1, y1, x2, y2
 
+def inverse_kinematics(x, y, L1, L2):
+    # Distance from the origin to the target
+    r = np.hypot(x, y)
+
+    # Check whether the target is reachable
+    if not (abs(L1 - L2) <= r <= L1 + L2):
+        raise ValueError("Target is outside the reachable workspace")
+
+    # Calculate the second joint angle
+    cos_theta2 = (
+        r**2 - L1**2 - L2**2
+    ) / (2 * L1 * L2)
+    cos_theta2 = np.clip(cos_theta2, -1.0, 1.0)
+    theta2 = np.arccos(cos_theta2)
+
+    # Calculate the first joint angle
+    alpha = np.arctan2(y, x)
+    beta = np.arctan2(
+        L2 * np.sin(theta2),
+        L1 + L2 * np.cos(theta2)
+    )
+    theta1 = alpha - beta
+
+    return theta1, theta2
+
 def calculate_jacobian(theta1, theta2, L1, L2):
     j11 = -L1 * np.sin(theta1) - L2 * np.sin(theta1 + theta2)
     j12 = -L2 * np.sin(theta1 + theta2)
@@ -30,6 +55,22 @@ def calculate_jacobian(theta1, theta2, L1, L2):
     ])
 
     return J
+
+# 2%整定時間を計算する関数
+def calculate_settling_time(times, angles, target):
+    initial_error = abs(target - angles[0])
+    threshold = 0.02 * initial_error
+
+    for i in range(len(angles)):
+        # この時刻以降、すべて許容範囲内にあるか
+        remaining_errors = np.abs(
+            np.array(angles[i:]) - target
+        )
+
+        if np.all(remaining_errors <= threshold):
+            return times[i]
+
+    return None
 
 # 目標座標
 target_x = 1.2
@@ -213,17 +254,11 @@ for step in range(100):
 
 
 # 第2関節の2%整定時間を計算
-initial_error = abs(theta2_ik - theta2_history[0])
-threshold = 0.02 * initial_error
-
-settling_time = None
-
-for i, angle in enumerate(theta2_history):
-    error = abs(theta2_ik - angle)
-
-    if error <= threshold:
-        settling_time = time_history[i]
-        break
+settling_time = calculate_settling_time(
+    time_history,
+    theta2_history,
+    theta2_ik
+)
 
 if settling_time is not None:
     print(f"Joint 2 Settling Time: {settling_time:.2f} s")
@@ -274,6 +309,7 @@ ax.legend()
 J = 0.1        # 慣性モーメント [kg m^2]
 b = 0.05       # 粘性摩擦係数 [N m s/rad]
 Kp_torque = 1.0  # トルク制御用の比例ゲイン [N m/rad]
+joint2_disturbance = -0.1  # P・PD・PID共通の外乱トルク [N m]
 
 # 初期状態
 theta2_dynamic = theta2
@@ -283,7 +319,7 @@ omega2_dynamic = 0.0
 error2_dynamic = theta2_ik - theta2_dynamic
 
 # P制御によるトルク指令
-tau2 = Kp_torque * error2_dynamic
+tau2 = Kp_torque * error2_dynamic + joint2_disturbance
 
 # 運動方程式から角加速度を計算
 alpha2 = (tau2 - b * omega2_dynamic) / J
@@ -317,7 +353,7 @@ for step in range(200):
     error = theta2_ik - theta2_dynamic
 
     # P制御によるトルク
-    tau = Kp_torque * error
+    tau = Kp_torque * error + joint2_disturbance
 
     # 運動方程式
     alpha = (tau - b * omega2_dynamic) / J
@@ -374,8 +410,8 @@ for step in range(200):
 
     # PD制御によるトルク指令
     tau = Kp_torque * error - Kd_torque * omega2_pd
-    
-    tau -= 0.1  # 外乱トルク 0.1 N·m
+
+    tau += joint2_disturbance
 
 
     # 運動方程式
@@ -416,23 +452,6 @@ print(f"P Control Damping Ratio: {zeta_p:.3f}")
 print(f"PD Control Damping Ratio: {zeta_pd:.3f}")
 print(f"Critical Kd: {Kd_critical:.3f}")
 
-
-
-# 2%整定時間を計算する関数
-def calculate_settling_time(times, angles, target):
-    initial_error = abs(target - angles[0])
-    threshold = 0.02 * initial_error
-
-    for i in range(len(angles)):
-        # この時刻以降、すべて許容範囲内にあるか
-        remaining_errors = np.abs(
-            np.array(angles[i:]) - target
-        )
-
-        if np.all(remaining_errors <= threshold):
-            return times[i]
-
-    return None
 
 
 # 慣性を考慮したP制御の整定時間
@@ -486,7 +505,7 @@ for step in range(200):
     )
 
     # PD制御と同じ外乱を加える
-    tau -= 0.1
+    tau += joint2_disturbance
 
     # 運動方程式
     alpha = (tau - b * omega2_pid) / J
@@ -545,6 +564,12 @@ Kd1 = 0.4
 theta1_pid = theta1
 omega1_pid = 0.0
 integral1 = 0.0
+
+print("\n--- Joint 1 Initial State ---")
+print(f"Initial Angle: {np.rad2deg(theta1_pid):.2f} deg")
+print(f"Target Angle: {np.rad2deg(theta1_ik):.2f} deg")
+print(f"Initial Velocity: {omega1_pid:.2f} rad/s")
+print(f"Integral Error: {integral1:.2f}")
 
 # Joint 1 angle history
 theta1_pid_history = [theta1_pid]
@@ -611,7 +636,7 @@ def simulate_pid(kd, kp=Kp_torque, ki=Ki_torque):
             - kd * omega
         )
 
-        tau -= 0.1
+        tau += joint2_disturbance
 
         alpha = (tau - b * omega) / J
 
@@ -939,14 +964,6 @@ if after_settling_time is not None:
 
 ax_compare.legend()
 
-print("\n--- Joint 1 Initial State ---")
-print(f"Initial Angle: {np.rad2deg(theta1_pid):.2f} deg")
-print(f"Target Angle: {np.rad2deg(theta1_ik):.2f} deg")
-print(f"Initial Velocity: {omega1_pid:.2f} rad/s")
-print(f"Integral Error: {integral1:.2f}")
-
-
-
 # Bring Figure 1 (robot arm animation) to the front
 fig1 = plt.figure(1)
 
@@ -983,7 +1000,7 @@ print(f"Position Error: {position_error * 1000:.2f} mm")
 
 
 # End-effector position error history
-position_error_history = []
+fixed_target_error_history = []
 
 for theta1_now, theta2_now in zip(
     theta1_pid_history,
@@ -1004,14 +1021,14 @@ for theta1_now, theta2_now in zip(
     )
 
     # Convert to millimeters
-    position_error_history.append(error * 1000)
+    fixed_target_error_history.append(error * 1000)
 
 # Position tolerance [mm]
 position_tolerance = 20.0
 position_settling_time = None
 
-for i in range(len(position_error_history)):
-    remaining_errors = position_error_history[i:]
+for i in range(len(fixed_target_error_history)):
+    remaining_errors = fixed_target_error_history[i:]
 
     if np.all(
         np.array(remaining_errors) <= position_tolerance
@@ -1034,7 +1051,7 @@ fig_error, ax_error = plt.subplots()
 
 ax_error.plot(
     dynamic_time_history,
-    position_error_history,
+    fixed_target_error_history,
     label="End-Effector Position Error"
 )
 
@@ -1062,7 +1079,7 @@ ax_error.legend()
 
 print(
     f"Final Position Error: "
-    f"{position_error_history[-1]:.2f} mm"
+    f"{fixed_target_error_history[-1]:.2f} mm"
 )
 
 # Final joint angle errors [rad]
@@ -1607,5 +1624,1440 @@ for test_dt in [0.05, 0.025, 0.0125]:
 
     previous_error = error
 
-plt.show()
+print("\n--- Inverse Kinematics Function Test ---")
 
+for x, y in [(1.2, 0.8), (1.3, 0.8)]:
+    th1, th2 = inverse_kinematics(x, y, L1, L2)
+    _, _, actual_x, actual_y = forward_kinematics(
+        th1, th2, L1, L2
+    )
+    error = np.hypot(actual_x - x, actual_y - y)
+
+    print(f"Target: ({x:.3f}, {y:.3f}) m")
+    print(
+        f"Joint Angles: "
+        f"({np.rad2deg(th1):.3f}, "
+        f"{np.rad2deg(th2):.3f}) deg"
+    )
+    print(f"Position Error: {error * 1000:.6f} mm")
+
+# --- Desired Joint Trajectory Generation ---
+
+# Trajectory settings
+trajectory_dt = 0.05
+trajectory_time = np.linspace(0.0, 1.0, 21)
+
+# Desired joint angle histories
+theta1_desired_history = []
+theta2_desired_history = []
+
+for t in trajectory_time:
+
+    # Desired end-effector position
+    x_desired = 1.2 + 0.1 * t
+    y_desired = 0.8
+
+    # Convert desired position to joint angles
+    theta1_desired, theta2_desired = inverse_kinematics(
+        x_desired, y_desired, L1, L2
+    )
+
+    # Save desired joint angles
+    theta1_desired_history.append(theta1_desired)
+    theta2_desired_history.append(theta2_desired)
+
+print("\n--- Desired Joint Trajectory ---")
+print(f"Number of Points: {len(trajectory_time)}")
+
+for i in [0, 10, 20]:
+    print(
+        f"Time: {trajectory_time[i]:.2f} s | "
+        f"Theta1: {np.rad2deg(theta1_desired_history[i]):.3f} deg | "
+        f"Theta2: {np.rad2deg(theta2_desired_history[i]):.3f} deg"
+    )
+
+# --- Desired Joint Trajectory Plot ---
+
+plt.figure(figsize=(9, 5))
+
+# First joint angle
+plt.plot(
+    trajectory_time,
+    np.rad2deg(theta1_desired_history),
+    label="Joint 1 Desired Angle",
+    linewidth=2
+)
+
+# Second joint angle
+plt.plot(
+    trajectory_time,
+    np.rad2deg(theta2_desired_history),
+    label="Joint 2 Desired Angle",
+    linewidth=2
+)
+
+plt.xlabel("Time [s]")
+plt.ylabel("Joint Angle [deg]")
+plt.title("Desired Joint Angle Trajectories")
+
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+
+# --- PID Trajectory Tracking ---
+
+# PID gains
+tracking_kp = 1.2
+tracking_ki = 0.3
+tracking_kd = 0.4
+
+# Simplified joint dynamics
+tracking_inertia = 0.1
+tracking_damping = 0.05
+
+# Initial joint angles: start at the first desired pose
+tracking_theta = np.array([
+    theta1_desired_history[0],
+    theta2_desired_history[0]
+], dtype=float)
+
+# Initial angular velocities
+tracking_omega = np.zeros(2)
+
+# PID internal states
+tracking_integral = np.zeros(2)
+tracking_previous_error = np.zeros(2)
+
+# Save actual joint angles
+theta1_actual_history = [tracking_theta[0]]
+theta2_actual_history = [tracking_theta[1]]
+
+# Simulate 20 intervals
+for k in range(len(trajectory_time) - 1):
+
+    dt = trajectory_time[k + 1] - trajectory_time[k]
+
+    # Desired joint angles at current time
+    desired_theta = np.array([
+        theta1_desired_history[k],
+        theta2_desired_history[k]
+    ])
+
+    # PID error
+    error = desired_theta - tracking_theta
+
+    # Integral term
+    tracking_integral += error * dt
+
+    # Derivative term
+    error_derivative = (
+        error - tracking_previous_error
+    ) / dt
+
+    # PID output: joint torques
+    torque = (
+        tracking_kp * error
+        + tracking_ki * tracking_integral
+        + tracking_kd * error_derivative
+    )
+
+    # Joint angular acceleration
+    acceleration = (
+        torque - tracking_damping * tracking_omega
+    ) / tracking_inertia
+
+    # Semi-implicit Euler integration
+    tracking_omega += acceleration * dt
+    tracking_theta += tracking_omega * dt
+
+    tracking_previous_error = error.copy()
+
+    # Save actual angles
+    theta1_actual_history.append(tracking_theta[0])
+    theta2_actual_history.append(tracking_theta[1])
+
+# Final target angles
+final_desired_theta = np.array([
+    theta1_desired_history[-1],
+    theta2_desired_history[-1]
+])
+
+# Final angular errors
+final_angle_error = final_desired_theta - tracking_theta
+
+# Final end-effector position
+_, _, actual_x, actual_y = forward_kinematics(
+    tracking_theta[0], tracking_theta[1], L1, L2
+)
+
+final_position_error = np.hypot(
+    actual_x - 1.3,
+    actual_y - 0.8
+)
+
+print("\n--- PID Trajectory Tracking ---")
+print(
+    "Final Desired Angles:",
+    np.rad2deg(final_desired_theta)
+)
+print(
+    "Final Actual Angles:",
+    np.rad2deg(tracking_theta)
+)
+print(
+    "Final Angular Errors:",
+    np.rad2deg(final_angle_error)
+)
+print(
+    f"Final Position Error: "
+    f"{final_position_error * 1000:.4f} mm"
+)
+
+# --- PID Joint Trajectory Tracking Plot ---
+
+fig, axes = plt.subplots(2, 1, figsize=(9, 8))
+
+# Joint 1
+axes[0].plot(
+    trajectory_time,
+    np.rad2deg(theta1_desired_history),
+    label="Desired Joint 1",
+    linestyle="--",
+    linewidth=2
+)
+
+axes[0].plot(
+    trajectory_time,
+    np.rad2deg(theta1_actual_history),
+    label="Actual Joint 1",
+    linewidth=2
+)
+
+axes[0].set_title("Joint 1 Trajectory Tracking")
+axes[0].set_ylabel("Joint Angle [deg]")
+axes[0].grid(True)
+axes[0].legend()
+
+# Joint 2
+axes[1].plot(
+    trajectory_time,
+    np.rad2deg(theta2_desired_history),
+    label="Desired Joint 2",
+    linestyle="--",
+    linewidth=2
+)
+
+axes[1].plot(
+    trajectory_time,
+    np.rad2deg(theta2_actual_history),
+    label="Actual Joint 2",
+    linewidth=2
+)
+
+axes[1].set_title("Joint 2 Trajectory Tracking")
+axes[1].set_xlabel("Time [s]")
+axes[1].set_ylabel("Joint Angle [deg]")
+axes[1].grid(True)
+axes[1].legend()
+
+plt.tight_layout()
+
+# --- End-Effector Trajectory Tracking Error ---
+
+trajectory_pid_error_history = []
+
+for k, t in enumerate(trajectory_time):
+
+    # Desired end-effector position
+    x_desired = 1.2 + 0.1 * t
+    y_desired = 0.8
+
+    # Actual joint angles
+    theta1_actual = theta1_actual_history[k]
+    theta2_actual = theta2_actual_history[k]
+
+    # Actual end-effector position
+    _, _, x_actual, y_actual = forward_kinematics(
+        theta1_actual, theta2_actual, L1, L2
+    )
+
+    # Position error [mm]
+    error_mm = np.hypot(
+        x_actual - x_desired,
+        y_actual - y_desired
+    ) * 1000
+
+    trajectory_pid_error_history.append(error_mm)
+
+# Error statistics
+max_error = np.max(trajectory_pid_error_history)
+mean_error = np.mean(trajectory_pid_error_history)
+final_error = trajectory_pid_error_history[-1]
+
+print("\n--- End-Effector Tracking Error ---")
+print(f"Maximum Error: {max_error:.4f} mm")
+print(f"Mean Error: {mean_error:.4f} mm")
+print(f"Final Error: {final_error:.4f} mm")
+
+# Plot position error
+plt.figure(figsize=(9, 5))
+
+plt.plot(
+    trajectory_time,
+    trajectory_pid_error_history,
+    linewidth=2,
+    label="Position Tracking Error"
+)
+
+plt.xlabel("Time [s]")
+plt.ylabel("Position Error [mm]")
+plt.title("End-Effector Trajectory Tracking Error")
+
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+
+
+# --- Desired vs Actual End-Effector Trajectory ---
+
+desired_x_history = []
+desired_y_history = []
+
+actual_x_history = []
+actual_y_history = []
+
+for k, t in enumerate(trajectory_time):
+
+    # Desired end-effector position
+    x_desired = 1.2 + 0.1 * t
+    y_desired = 0.8
+
+    desired_x_history.append(x_desired)
+    desired_y_history.append(y_desired)
+
+    # Actual end-effector position from PID joint angles
+    _, _, x_actual, y_actual = forward_kinematics(
+        theta1_actual_history[k],
+        theta2_actual_history[k],
+        L1,
+        L2
+    )
+
+    actual_x_history.append(x_actual)
+    actual_y_history.append(y_actual)
+
+# Plot desired and actual trajectories
+plt.figure(figsize=(9, 6))
+
+plt.plot(
+    desired_x_history,
+    desired_y_history,
+    "r--",
+    linewidth=2,
+    label="Desired Trajectory"
+)
+
+plt.plot(
+    actual_x_history,
+    actual_y_history,
+    "b-",
+    linewidth=2,
+    label="Actual PID Trajectory"
+)
+
+plt.xlabel("End-Effector X Position [m]")
+plt.ylabel("End-Effector Y Position [m]")
+plt.title("Desired vs Actual End-Effector Trajectory")
+
+plt.grid(True)
+plt.legend()
+plt.axis("equal")
+plt.tight_layout()
+
+
+# --- X and Y Tracking Error Analysis ---
+
+# Signed tracking errors [mm]
+x_error_history = (
+    np.array(desired_x_history)
+    - np.array(actual_x_history)
+) * 1000
+
+y_error_history = (
+    np.array(desired_y_history)
+    - np.array(actual_y_history)
+) * 1000
+
+# Find the time of maximum position error
+max_error_index = np.argmax(trajectory_pid_error_history)
+
+print("\n--- X and Y Tracking Error ---")
+
+print(
+    f"Maximum Error Time: "
+    f"{trajectory_time[max_error_index]:.3f} s"
+)
+
+print(
+    f"X Error at Maximum: "
+    f"{x_error_history[max_error_index]:.4f} mm"
+)
+
+print(
+    f"Y Error at Maximum: "
+    f"{y_error_history[max_error_index]:.4f} mm"
+)
+
+print(
+    f"Final X Error: "
+    f"{x_error_history[-1]:.4f} mm"
+)
+
+print(
+    f"Final Y Error: "
+    f"{y_error_history[-1]:.4f} mm"
+)
+
+# Plot tracking errors
+plt.figure(figsize=(9, 5))
+
+plt.plot(
+    trajectory_time,
+    x_error_history,
+    label="X Tracking Error",
+    linewidth=2
+)
+
+plt.plot(
+    trajectory_time,
+    y_error_history,
+    label="Y Tracking Error",
+    linewidth=2
+)
+
+plt.axhline(0, color="black", linestyle="--", linewidth=1)
+
+plt.xlabel("Time [s]")
+plt.ylabel("Tracking Error [mm]")
+plt.title("X and Y End-Effector Tracking Errors")
+
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+
+# --- Jacobian Tracking Error Analysis ---
+
+# Final desired joint angles
+theta_desired_final = np.array([
+    theta1_desired_history[-1],
+    theta2_desired_history[-1]
+])
+
+# Final actual joint angles
+theta_actual_final = np.array([
+    theta1_actual_history[-1],
+    theta2_actual_history[-1]
+])
+
+# Actual minus desired joint angles [rad]
+delta_theta = theta_actual_final - theta_desired_final
+
+# Jacobian at final desired configuration
+J_final = calculate_jacobian(
+    theta_desired_final[0],
+    theta_desired_final[1],
+    L1,
+    L2
+)
+
+# Contributions from each joint [mm]
+error_from_joint1 = -J_final[:, 0] * delta_theta[0] * 1000
+error_from_joint2 = -J_final[:, 1] * delta_theta[1] * 1000
+
+# Predicted end-effector tracking error [mm]
+predicted_error = error_from_joint1 + error_from_joint2
+
+# Actual tracking error [mm]
+actual_error = np.array([
+    x_error_history[-1],
+    y_error_history[-1]
+])
+
+print("\n--- Jacobian Tracking Error Analysis ---")
+
+print("Joint 1 Contribution [mm]:", error_from_joint1)
+print("Joint 2 Contribution [mm]:", error_from_joint2)
+
+print("Predicted X/Y Error [mm]:", predicted_error)
+print("Actual X/Y Error [mm]:", actual_error)
+
+print(
+    "Approximation Difference [mm]:",
+    np.linalg.norm(predicted_error - actual_error)
+)
+
+
+# --- Desired Joint Angular Velocity ---
+
+desired_joint_velocity_history = []
+
+for k, t in enumerate(trajectory_time):
+
+    # Desired joint angles at time t
+    theta1_d = theta1_desired_history[k]
+    theta2_d = theta2_desired_history[k]
+
+    # Jacobian at desired configuration
+    J_desired = calculate_jacobian(
+        theta1_d, theta2_d, L1, L2
+    )
+
+    # Desired joint angular velocities [rad/s]
+    omega_desired = np.linalg.solve(
+        J_desired, desired_velocity
+    )
+
+    desired_joint_velocity_history.append(omega_desired)
+
+print("\n--- Desired Joint Angular Velocities ---")
+
+for k in [0, 10, 20]:
+    omega_deg = np.rad2deg(
+        desired_joint_velocity_history[k]
+    )
+
+    print(
+        f"Time: {trajectory_time[k]:.2f} s | "
+        f"Omega1: {omega_deg[0]:.4f} deg/s | "
+        f"Omega2: {omega_deg[1]:.4f} deg/s"
+    )
+
+# --- Actual vs Desired Joint Angular Velocities ---
+
+# Convert angle histories to NumPy arrays
+theta1_actual_array = np.array(theta1_actual_history)
+theta2_actual_array = np.array(theta2_actual_history)
+
+# Actual average angular velocities [rad/s]
+omega1_actual = np.diff(theta1_actual_array) / trajectory_dt
+omega2_actual = np.diff(theta2_actual_array) / trajectory_dt
+
+print("\n--- Actual vs Desired Angular Velocities ---")
+
+for k in [0, 9, 19]:
+
+    # Desired velocity at the start of the interval
+    omega_desired = desired_joint_velocity_history[k]
+
+    # Actual average velocity over the interval
+    omega_actual = np.array([
+        omega1_actual[k],
+        omega2_actual[k]
+    ])
+
+    print(
+        f"\nTime Interval: "
+        f"{trajectory_time[k]:.2f} - "
+        f"{trajectory_time[k+1]:.2f} s"
+    )
+
+    print(
+        "Desired Velocity [deg/s]:",
+        np.round(np.rad2deg(omega_desired), 4)
+    )
+
+    print(
+        "Actual Average Velocity [deg/s]:",
+        np.round(np.rad2deg(omega_actual), 4)
+    )
+
+# --- Desired Angular Acceleration and Feedforward Torque ---
+
+# Desired angular velocities [rad/s]
+omega_desired_array = np.array(
+    desired_joint_velocity_history
+)
+
+# Desired angular accelerations [rad/s^2]
+alpha_desired_array = np.gradient(
+    omega_desired_array,
+    trajectory_time,
+    axis=0
+)
+
+# Feedforward torques [Nm]
+torque_ff_array = (
+    tracking_inertia * alpha_desired_array
+    + tracking_damping * omega_desired_array
+)
+
+print("\n--- Feedforward Torque Calculation ---")
+
+for k in [0, 10, 20]:
+    print(f"\nTime: {trajectory_time[k]:.2f} s")
+
+    print(
+        "Desired Acceleration [deg/s^2]:",
+        np.round(np.rad2deg(alpha_desired_array[k]), 4)
+    )
+
+    print(
+        "Feedforward Torque [Nm]:",
+        np.round(torque_ff_array[k], 6)
+    )
+
+# --- PID + Feedforward Trajectory Tracking ---
+
+theta_ff = np.array([
+    theta1_desired_history[0],
+    theta2_desired_history[0]
+], dtype=float)
+
+omega_ff = np.zeros(2)
+integral_ff = np.zeros(2)
+previous_error_ff = np.zeros(2)
+
+trajectory_ff_error_history = []
+
+for k, t in enumerate(trajectory_time):
+
+    # Calculate current end-effector position
+    _, _, x_ff, y_ff = forward_kinematics(
+        theta_ff[0], theta_ff[1], L1, L2
+    )
+
+    # Save position tracking error [mm]
+    error_mm = np.hypot(
+        x_ff - (1.2 + 0.1 * t),
+        y_ff - 0.8
+    ) * 1000
+
+    trajectory_ff_error_history.append(error_mm)
+
+    # No integration after the final sample
+    if k == len(trajectory_time) - 1:
+        break
+
+    dt = trajectory_time[k + 1] - trajectory_time[k]
+
+    desired_theta = np.array([
+        theta1_desired_history[k],
+        theta2_desired_history[k]
+    ])
+
+    # PID feedback
+    error = desired_theta - theta_ff
+    integral_ff += error * dt
+
+    error_derivative = (
+        error - previous_error_ff
+    ) / dt
+
+    torque_pid = (
+        tracking_kp * error
+        + tracking_ki * integral_ff
+        + tracking_kd * error_derivative
+    )
+
+    # Add feedforward torque
+    torque_total = torque_pid + torque_ff_array[k]
+
+    # Simplified joint dynamics
+    acceleration_ff = (
+        torque_total - tracking_damping * omega_ff
+    ) / tracking_inertia
+
+    omega_ff += acceleration_ff * dt
+    theta_ff += omega_ff * dt
+
+    previous_error_ff = error.copy()
+
+# --- Hold Final Target After Trajectory ---
+
+hold_duration = 1.0
+hold_dt = 0.05
+hold_steps = int(round(hold_duration / hold_dt))
+
+final_target_theta = np.array([
+    theta1_desired_history[-1],
+    theta2_desired_history[-1]
+])
+
+_, _, hold_target_x, hold_target_y = forward_kinematics(
+    final_target_theta[0], final_target_theta[1], L1, L2
+)
+
+hold_time_history = [trajectory_time[-1]]
+hold_error_history = [trajectory_ff_error_history[-1]]
+
+# --- Velocity at the Start of Holding ---
+theta_hold_start = theta_ff.copy()
+omega_hold_start = omega_ff.copy()
+
+# Calculate end-effector velocity using Jacobian
+J_hold_start = calculate_jacobian(
+    theta_hold_start[0],
+    theta_hold_start[1],
+    L1,
+    L2
+)
+tip_velocity_start = J_hold_start @ omega_hold_start
+
+print("\n--- Velocity at 1.0 s ---")
+print(
+    "Joint Angular Velocities [deg/s]:",
+    np.round(np.rad2deg(omega_hold_start), 4)
+)
+print(
+    "End-Effector Velocity [m/s]:",
+    np.round(tip_velocity_start, 6)
+)
+print(
+    "End-Effector Speed [mm/s]:",
+    round(np.linalg.norm(tip_velocity_start) * 1000, 4)
+)
+
+for step in range(hold_steps):
+    # Fixed target: PID feedback only
+    error = final_target_theta - theta_ff
+    integral_ff += error * hold_dt
+
+    error_derivative = (
+        error - previous_error_ff
+    ) / hold_dt
+
+    torque = (
+        tracking_kp * error
+        + tracking_ki * integral_ff
+        + tracking_kd * error_derivative
+    )
+
+    acceleration = (
+        torque - tracking_damping * omega_ff
+    ) / tracking_inertia
+
+    omega_ff += acceleration * hold_dt
+    theta_ff += omega_ff * hold_dt
+
+    previous_error_ff = error.copy()
+
+    # Save position error relative to the fixed final target [mm]
+    _, _, x_hold, y_hold = forward_kinematics(
+        theta_ff[0], theta_ff[1], L1, L2
+    )
+    hold_error_mm = np.hypot(
+        x_hold - hold_target_x,
+        y_hold - hold_target_y
+    ) * 1000
+
+    hold_time_history.append(
+        trajectory_time[-1] + (step + 1) * hold_dt
+    )
+    hold_error_history.append(hold_error_mm)
+
+print("\n--- Holding Final Target ---")
+print(f"Error at 1.0 s: {hold_error_history[0]:.4f} mm")
+print(f"Maximum Hold Error: {max(hold_error_history):.4f} mm")
+print(f"Error at 2.0 s: {hold_error_history[-1]:.4f} mm")
+
+plt.figure(figsize=(9, 5))
+plt.plot(
+    hold_time_history,
+    hold_error_history,
+    linewidth=2,
+    label="Position Error During Hold"
+)
+plt.xlabel("Time [s]")
+plt.ylabel("Position Error [mm]")
+plt.title("Holding the Final Target Position")
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+
+# Compare tracking errors
+print("\n--- PID vs PID + Feedforward ---")
+
+print(
+    f"PID Only Maximum Error: "
+    f"{np.max(trajectory_pid_error_history):.4f} mm"
+)
+print(
+    f"PID + FF Maximum Error: "
+    f"{np.max(trajectory_ff_error_history):.4f} mm"
+)
+
+print(
+    f"PID Only Mean Error: "
+    f"{np.mean(trajectory_pid_error_history):.4f} mm"
+)
+print(
+    f"PID + FF Mean Error: "
+    f"{np.mean(trajectory_ff_error_history):.4f} mm"
+)
+
+print(
+    f"PID Only Final Error: "
+    f"{trajectory_pid_error_history[-1]:.4f} mm"
+)
+print(
+    f"PID + FF Final Error: "
+    f"{trajectory_ff_error_history[-1]:.4f} mm"
+)
+
+# --- PID vs PID + Feedforward Error Plot ---
+
+plt.figure(figsize=(9, 5))
+
+# PID only
+plt.plot(
+    trajectory_time,
+    trajectory_pid_error_history,
+    label="PID Only",
+    linewidth=2
+)
+
+# PID + Feedforward
+plt.plot(
+    trajectory_time,
+    trajectory_ff_error_history,
+    label="PID + Feedforward",
+    linewidth=2
+)
+
+plt.xlabel("Time [s]")
+plt.ylabel("Position Tracking Error [mm]")
+plt.title("PID vs PID + Feedforward Tracking Error")
+
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+
+
+
+# --- Step 5-17: Quintic Trajectory Generation ---
+
+T = 1.0
+quintic_time = np.linspace(0.0, T, 101)
+
+s = quintic_time / T
+
+# Desired position [m]
+quintic_x = 1.2 + 0.1 * (
+    10*s**3 - 15*s**4 + 6*s**5
+)
+
+# Desired velocity [m/s]
+quintic_vx = (0.1 / T) * (
+    30*s**2 - 60*s**3 + 30*s**4
+)
+
+# Desired acceleration [m/s^2]
+quintic_ax = (0.1 / T**2) * (
+    60*s - 180*s**2 + 120*s**3
+)
+
+print("\n--- Quintic Trajectory ---")
+
+for k in [0, 50, 100]:
+    print(
+        f"Time: {quintic_time[k]:.2f} s | "
+        f"X: {quintic_x[k]:.4f} m | "
+        f"Vx: {quintic_vx[k]*1000:.4f} mm/s | "
+        f"Ax: {quintic_ax[k]:.4f} m/s^2"
+    )
+
+print(
+    f"Maximum Desired Speed: "
+    f"{np.max(np.abs(quintic_vx))*1000:.4f} mm/s"
+)
+
+# Plot the desired velocity
+plt.figure(figsize=(9, 5))
+
+plt.plot(
+    quintic_time,
+    quintic_vx * 1000,
+    label="Quintic Trajectory",
+    linewidth=2
+)
+
+plt.axhline(
+    100,
+    linestyle="--",
+    label="Previous Constant Velocity"
+)
+
+plt.xlabel("Time [s]")
+plt.ylabel("Desired X Velocity [mm/s]")
+plt.title("Quintic vs Constant-Velocity Trajectory")
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+
+
+# --- Step 5-18: Quintic Joint Trajectory ---
+
+quintic_tracking_time = np.linspace(0.0, 1.0, 21)
+
+quintic_theta_history = []
+quintic_omega_history = []
+
+for t in quintic_tracking_time:
+
+    s = t / T
+
+    # Desired end-effector position
+    x_d = 1.2 + 0.1 * (
+        10*s**3 - 15*s**4 + 6*s**5
+    )
+    y_d = 0.8
+
+    # Desired end-effector velocity
+    vx_d = (0.1 / T) * (
+        30*s**2 - 60*s**3 + 30*s**4
+    )
+    vy_d = 0.0
+
+    # Inverse kinematics
+    theta1_d, theta2_d = inverse_kinematics(
+        x_d, y_d, L1, L2
+    )
+
+    theta_d = np.array([theta1_d, theta2_d])
+
+    # Inverse velocity kinematics
+    J_d = calculate_jacobian(
+        theta1_d, theta2_d, L1, L2
+    )
+
+    omega_d = np.linalg.solve(
+        J_d,
+        np.array([vx_d, vy_d])
+    )
+
+    quintic_theta_history.append(theta_d)
+    quintic_omega_history.append(omega_d)
+
+quintic_theta_history = np.array(
+    quintic_theta_history
+)
+
+quintic_omega_history = np.array(
+    quintic_omega_history
+)
+
+print("\n--- Quintic Joint Trajectory ---")
+
+for k in [0, 10, 20]:
+
+    theta_deg = np.rad2deg(
+        quintic_theta_history[k]
+    )
+
+    omega_deg = np.rad2deg(
+        quintic_omega_history[k]
+    )
+
+    print(
+        f"\nTime: {quintic_tracking_time[k]:.2f} s"
+    )
+
+    print(
+        "Desired Angles [deg]:",
+        np.round(theta_deg, 4)
+    )
+
+    print(
+        "Desired Angular Velocities [deg/s]:",
+        np.round(omega_deg, 4)
+    )
+
+
+# --- Step 5-19: Quintic Feedforward Torque ---
+
+def calculate_jacobian_dot(theta1, theta2, omega1, omega2, L1, L2):
+
+    theta12 = theta1 + theta2
+    omega12 = omega1 + omega2
+
+    jdot11 = (
+        -L1 * np.cos(theta1) * omega1
+        -L2 * np.cos(theta12) * omega12
+    )
+
+    jdot12 = -L2 * np.cos(theta12) * omega12
+
+    jdot21 = (
+        -L1 * np.sin(theta1) * omega1
+        -L2 * np.sin(theta12) * omega12
+    )
+
+    jdot22 = -L2 * np.sin(theta12) * omega12
+
+    return np.array([
+        [jdot11, jdot12],
+        [jdot21, jdot22]
+    ])
+
+
+quintic_alpha_history = []
+quintic_torque_ff_history = []
+
+for k, t in enumerate(quintic_tracking_time):
+
+    s = t / T
+
+    # Desired end-effector acceleration [m/s^2]
+    ax_d = (0.1 / T**2) * (
+        60*s - 180*s**2 + 120*s**3
+    )
+
+    a_d = np.array([ax_d, 0.0])
+
+    theta_d = quintic_theta_history[k]
+    omega_d = quintic_omega_history[k]
+
+    J_d = calculate_jacobian(
+        theta_d[0], theta_d[1], L1, L2
+    )
+
+    J_dot = calculate_jacobian_dot(
+        theta_d[0], theta_d[1],
+        omega_d[0], omega_d[1],
+        L1, L2
+    )
+
+    # Desired joint angular acceleration [rad/s^2]
+    alpha_d = np.linalg.solve(
+        J_d,
+        a_d - J_dot @ omega_d
+    )
+
+    # Feedforward torque [Nm]
+    torque_ff = (
+        tracking_inertia * alpha_d
+        + tracking_damping * omega_d
+    )
+
+    quintic_alpha_history.append(alpha_d)
+    quintic_torque_ff_history.append(torque_ff)
+
+quintic_alpha_history = np.array(quintic_alpha_history)
+quintic_torque_ff_history = np.array(quintic_torque_ff_history)
+
+print("\n--- Quintic Feedforward Torque ---")
+
+for k in [0, 10, 20]:
+
+    print(f"\nTime: {quintic_tracking_time[k]:.2f} s")
+
+    print(
+        "Desired Angular Acceleration [deg/s^2]:",
+        np.round(
+            np.rad2deg(quintic_alpha_history[k]), 4
+        )
+    )
+
+    print(
+        "Feedforward Torque [Nm]:",
+        np.round(
+            quintic_torque_ff_history[k], 6
+        )
+    )
+# --- Step 5-20: Quintic PID + Feedforward Tracking ---
+
+quintic_actual_theta = quintic_theta_history[0].copy()
+quintic_actual_omega = np.zeros(2)
+
+quintic_integral_error = np.zeros(2)
+quintic_previous_error = np.zeros(2)
+
+quintic_position_error_history = []
+
+for k, t in enumerate(quintic_tracking_time):
+
+    # Desired end-effector position
+    s = t / T
+    x_target = 1.2 + 0.1 * (
+        10*s**3 - 15*s**4 + 6*s**5
+    )
+    y_target = 0.8
+
+    # Actual end-effector position
+    _, _, x_actual, y_actual = forward_kinematics(
+        quintic_actual_theta[0],
+        quintic_actual_theta[1],
+        L1,
+        L2
+    )
+
+    # Position error [mm]
+    position_error_mm = np.hypot(
+        x_target - x_actual,
+        y_target - y_actual
+    ) * 1000
+
+    quintic_position_error_history.append(
+        position_error_mm
+    )
+
+    # Stop after recording the final sample
+    if k == len(quintic_tracking_time) - 1:
+        break
+
+    dt = (
+        quintic_tracking_time[k + 1]
+        - quintic_tracking_time[k]
+    )
+
+    # Desired joint angles
+    desired_theta = quintic_theta_history[k]
+
+    # PID feedback
+    error = desired_theta - quintic_actual_theta
+    quintic_integral_error += error * dt
+
+    error_derivative = (
+        error - quintic_previous_error
+    ) / dt
+
+    torque_pid = (
+        tracking_kp * error
+        + tracking_ki * quintic_integral_error
+        + tracking_kd * error_derivative
+    )
+
+    # Feedforward torque from Step 5-19
+    torque_ff = quintic_torque_ff_history[k]
+
+    torque_total = torque_pid + torque_ff
+
+    # Simplified joint dynamics
+    acceleration = (
+        torque_total
+        - tracking_damping * quintic_actual_omega
+    ) / tracking_inertia
+
+    # Semi-implicit Euler integration
+    quintic_actual_omega += acceleration * dt
+    quintic_actual_theta += quintic_actual_omega * dt
+
+    quintic_previous_error = error.copy()
+
+# Final end-effector velocity
+J_actual_final = calculate_jacobian(
+    quintic_actual_theta[0],
+    quintic_actual_theta[1],
+    L1,
+    L2
+)
+
+quintic_tip_velocity_final = (
+    J_actual_final @ quintic_actual_omega
+)
+
+print("\n--- Quintic PID + Feedforward Tracking ---")
+
+print(
+    f"Maximum Error: "
+    f"{np.max(quintic_position_error_history):.4f} mm"
+)
+
+print(
+    f"Mean Error: "
+    f"{np.mean(quintic_position_error_history):.4f} mm"
+)
+
+print(
+    f"Final Error: "
+    f"{quintic_position_error_history[-1]:.4f} mm"
+)
+
+print(
+    f"Final End-Effector Speed: "
+    f"{np.linalg.norm(quintic_tip_velocity_final)*1000:.4f} mm/s"
+)
+
+
+# --- Step 5-21: Quintic Final Target Holding ---
+
+hold_theta_q = quintic_actual_theta.copy()
+hold_omega_q = quintic_actual_omega.copy()
+hold_integral_q = quintic_integral_error.copy()
+hold_previous_error_q = quintic_previous_error.copy()
+
+hold_target_theta_q = quintic_theta_history[-1].copy()
+
+hold_dt_q = 0.05
+hold_steps_q = 20
+
+hold_time_q = [1.0]
+hold_error_q = [quintic_position_error_history[-1]]
+
+for step in range(hold_steps_q):
+
+    # Fixed target: PID feedback only
+    error = hold_target_theta_q - hold_theta_q
+
+    hold_integral_q += error * hold_dt_q
+
+    error_derivative = (
+        error - hold_previous_error_q
+    ) / hold_dt_q
+
+    torque = (
+        tracking_kp * error
+        + tracking_ki * hold_integral_q
+        + tracking_kd * error_derivative
+    )
+
+    # Joint dynamics
+    acceleration = (
+        torque - tracking_damping * hold_omega_q
+    ) / tracking_inertia
+
+    hold_omega_q += acceleration * hold_dt_q
+    hold_theta_q += hold_omega_q * hold_dt_q
+
+    hold_previous_error_q = error.copy()
+
+    # Actual end-effector position
+    _, _, x_hold_q, y_hold_q = forward_kinematics(
+        hold_theta_q[0], hold_theta_q[1], L1, L2
+    )
+
+    position_error = np.hypot(
+        1.3 - x_hold_q,
+        0.8 - y_hold_q
+    ) * 1000
+
+    hold_time_q.append(
+        1.0 + (step + 1) * hold_dt_q
+    )
+    hold_error_q.append(position_error)
+
+# End-effector speed at 2.0 s
+J_hold_final_q = calculate_jacobian(
+    hold_theta_q[0],
+    hold_theta_q[1],
+    L1,
+    L2
+)
+
+tip_velocity_final_q = J_hold_final_q @ hold_omega_q
+
+print("\n--- Quintic Final Target Holding ---")
+
+print(
+    f"Error at 1.0 s: "
+    f"{hold_error_q[0]:.4f} mm"
+)
+
+print(
+    f"Maximum Hold Error: "
+    f"{np.max(hold_error_q):.4f} mm"
+)
+
+print(
+    f"Error at 2.0 s: "
+    f"{hold_error_q[-1]:.4f} mm"
+)
+
+print(
+    f"End-Effector Speed at 2.0 s: "
+    f"{np.linalg.norm(tip_velocity_final_q)*1000:.4f} mm/s"
+)
+
+# Plot holding error
+plt.figure(figsize=(9, 5))
+
+plt.plot(
+    hold_time_q,
+    hold_error_q,
+    linewidth=2,
+    label="Quintic Trajectory + PID + FF"
+)
+
+plt.xlabel("Time [s]")
+plt.ylabel("Position Error [mm]")
+plt.title("Quintic Trajectory: Final Target Holding")
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+
+
+# --- Step 5-22: Constant vs Quintic Tracking Error ---
+
+# Reproduce constant-velocity reference trajectory
+comparison_time = np.linspace(0.0, 1.0, 21)
+
+constant_theta_desired = []
+constant_omega_desired = []
+
+for t in comparison_time:
+
+    x_d = 1.2 + 0.1 * t
+    y_d = 0.8
+
+    theta1_d, theta2_d = inverse_kinematics(
+        x_d, y_d, L1, L2
+    )
+
+    theta_d = np.array([theta1_d, theta2_d])
+
+    J_d = calculate_jacobian(
+        theta1_d, theta2_d, L1, L2
+    )
+
+    omega_d = np.linalg.solve(
+        J_d, np.array([0.1, 0.0])
+    )
+
+    constant_theta_desired.append(theta_d)
+    constant_omega_desired.append(omega_d)
+
+constant_theta_desired = np.array(
+    constant_theta_desired
+)
+
+constant_omega_desired = np.array(
+    constant_omega_desired
+)
+
+# Same numerical acceleration method as earlier
+constant_alpha_desired = np.gradient(
+    constant_omega_desired,
+    comparison_time,
+    axis=0
+)
+
+constant_torque_ff = (
+    tracking_inertia * constant_alpha_desired
+    + tracking_damping * constant_omega_desired
+)
+
+# Reproduce PID + FF simulation
+constant_theta_actual = constant_theta_desired[0].copy()
+constant_omega_actual = np.zeros(2)
+
+constant_integral = np.zeros(2)
+constant_previous_error = np.zeros(2)
+
+constant_error_history = []
+
+for k, t in enumerate(comparison_time):
+
+    x_target = 1.2 + 0.1 * t
+    y_target = 0.8
+
+    _, _, x_actual, y_actual = forward_kinematics(
+        constant_theta_actual[0],
+        constant_theta_actual[1],
+        L1, L2
+    )
+
+    position_error = np.hypot(
+        x_target - x_actual,
+        y_target - y_actual
+    ) * 1000
+
+    constant_error_history.append(position_error)
+
+    if k == len(comparison_time) - 1:
+        break
+
+    dt = comparison_time[k + 1] - comparison_time[k]
+
+    error = (
+        constant_theta_desired[k]
+        - constant_theta_actual
+    )
+
+    constant_integral += error * dt
+
+    error_derivative = (
+        error - constant_previous_error
+    ) / dt
+
+    torque_pid = (
+        tracking_kp * error
+        + tracking_ki * constant_integral
+        + tracking_kd * error_derivative
+    )
+
+    torque_total = torque_pid + constant_torque_ff[k]
+
+    acceleration = (
+        torque_total
+        - tracking_damping * constant_omega_actual
+    ) / tracking_inertia
+
+    constant_omega_actual += acceleration * dt
+    constant_theta_actual += constant_omega_actual * dt
+
+    constant_previous_error = error.copy()
+
+# --- Step 5-22: Save Tracking Error Comparison ---
+from pathlib import Path
+
+fig, ax = plt.subplots(figsize=(10, 5))
+
+ax.plot(
+    comparison_time,
+    constant_error_history,
+    label="Constant Velocity + PID + FF",
+    linewidth=2
+)
+
+ax.plot(
+    quintic_tracking_time,
+    quintic_position_error_history,
+    label="Quintic Trajectory + PID + FF",
+    linewidth=2
+)
+
+ax.set_xlabel("Time [s]")
+ax.set_ylabel("Position Error [mm]")
+ax.set_title("Tracking Error: Constant vs Quintic Trajectory")
+ax.grid(True)
+ax.legend()
+fig.tight_layout()
+
+output_dir = Path("assets")
+output_dir.mkdir(exist_ok=True)
+
+
+output_path = output_dir / "trajectory_tracking_comparison.png"
+
+fig.savefig(
+    output_path,
+    dpi=200,
+    bbox_inches="tight"
+)
+
+print(f"Saved graph: {output_path}")
+
+
+print("\n--- Step 5-22: Tracking Error Comparison ---")
+
+print(
+    f"Constant Maximum Error: "
+    f"{np.max(constant_error_history):.4f} mm"
+)
+
+print(
+    f"Quintic Maximum Error: "
+    f"{np.max(quintic_position_error_history):.4f} mm"
+)
+
+print(
+    f"Constant Mean Error: "
+    f"{np.mean(constant_error_history):.4f} mm"
+)
+
+print(
+    f"Quintic Mean Error: "
+    f"{np.mean(quintic_position_error_history):.4f} mm"
+)
+
+plt.show()

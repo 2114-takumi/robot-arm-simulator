@@ -1,0 +1,1053 @@
+{
+  "figures": [
+    {
+      "number": 1,
+      "size_inches": [
+        6.4,
+        4.8
+      ],
+      "dpi": 100.0,
+      "axes": [
+        {
+          "title": "2-Link Robot Arm",
+          "xlabel": "X [m]",
+          "ylabel": "Y [m]",
+          "xlim": [
+            -2.0,
+            2.0
+          ],
+          "ylim": [
+            -1.4903225806451612,
+            1.4903225806451612
+          ],
+          "xscale": "linear",
+          "yscale": "linear",
+          "aspect": 1.0,
+          "lines": [
+            {
+              "array_prefix": "plot.figure_01.axis_0.line_0",
+              "label": "_child0",
+              "color": [
+                0.12156862745098039,
+                0.4666666666666667,
+                0.7058823529411765
+              ],
+              "linestyle": "-",
+              "linewidth": 3.0,
+              "marker": "o"
+            },
+            {
+              "array_prefix": "plot.figure_01.axis_0.line_1",
+              "label": "IK Pose",
+              "color": [
+                1.0,
+                0.4980392156862745,
+                0.054901960784313725
+              ],
+              "linestyle": "--",
+              "linewidth": 2.0,
+              "marker": "o"
+            }
+          ],
+          "collections": [
+            {
+              "array_prefix": "plot.figure_01.axis_0.collection_0",
+              "label": "Target"
+            }
+          ],
+          "patches": [],
+          "legend": [
+            "IK Pose",
+            "Target"
+          ],
+          "xgrid": true,
+          "ygrid": true
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "size_inches": [
+        6.4,
+        4.8
+      ],
+      "dpi": 100.0,
+      "axes": [
+        {
+          "title": "P Control Response",
+          "xlabel": "Time [s]",
+          "ylabel": "Joint Angle [deg]",
+          "xlim": [
+            -0.25,
+            5.25
+          ],
+          "ylim": [
+            -50.951741201086406,
+            79.98656522281456
+          ],
+          "xscale": "linear",
+          "yscale": "linear",
+          "aspect": "auto",
+          "lines": [
+            {
+              "array_prefix": "plot.figure_02.axis_0.line_0",
+              "label": "Joint 1",
+              "color": [
+                0.12156862745098039,
+                0.4666666666666667,
+                0.7058823529411765
+              ],
+              "linestyle": "-",
+              "linewidth": 1.5,
+              "marker": "None"
+            },
+            {
+              "array_prefix": "plot.figure_02.axis_0.line_1",
+              "label": "Joint 2",
+              "color": [
+                1.0,
+                0.4980392156862745,
+                0.054901960784313725
+              ],
+              "linestyle": "-",
+              "linewidth": 1.5,
+              "marker": "None"
+            },
+            {
+              "array_prefix": "plot.figure_02.axis_0.line_2",
+              "label": "Joint 1 Target",
+              "color": "C0",
+              "linestyle": "--",
+              "linewidth": 1.5,
+              "marker": "None"
+            },
+            {
+              "array_prefix": "plot.figure_02.axis_0.line_3",
+              "label": "Joint 2 Target",
+              "color": "C0",
+              "linestyle": "--",
+              "linewidth": 1.5,
+              "marker": "None"
+            }
+          ],
+          "collections": [],
+          "patches": [],
+          "legend": [
+            "Joint 1",
+            "Joint 2",
+            "Joint 1 Target",
+            "Joint 2 Target"
+          ],
+          "xgrid": true,
+          "ygrid": true
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "size_inches": [
+        6.4,
+        4.8
+      ],
+      "dpi": 100.0,
+      "axes": [
+        {
+          "title": "P vs PD Control with Inertia",
+          "xlabel": "Time [s]",
+          "ylabel": "Joint Angle [deg]",
+          "xlim": [
+            -0.5,
+            10.5
+          ],
+          "ylim": [
+            -55.08505952093975,
+            166.7862499397347
+          ],
+          "xscale": "linear",
+          "yscale": "linear",
+          "aspect": "auto",
+          "lines": [
+            {
+              "array_prefix": "plot.figure_03.axis_0.line_0",
+              "label": "Dynamic P Control",
+              "color": [
+                0.12156862745098039,
+                0.4666666666666667,
+                0.7058823529411765
+              ],
+              "linestyle": "-",
+              "linewidth": 1.5,
+              "marker": "None"
+            },
+            {
+              "array_prefix": "plot.figure_03.axis_0.line_1",
+              "label": "Target",
+              "color": "C0",
+              "linestyle": "--",
+              "linewidth": 1.5,
+              "marker": "None"
+            },
+            {
+              "array_prefix": "plot.figure_03.axis_0.line_2",
+              "label": "PD Control",
+              "color": [
+                1.0,
+                0.4980392156862745,
+                0.054901960784313725
+              ],
+              "linestyle": "-",
+              "linewidth": 1.5,
+              "marker": "None"
+            },
+            {
+              "array_prefix": "plot.figure_03.axis_0.line_3",
+              "label": "PID Control",
+              "color": [
+                0.17254901960784313,
+                0.6274509803921569,
+                0.17254901960784313
+              ],
+              "linestyle": "-",
+              "linewidth": 1.5,
+              "marker": "None"
+            }
+          ],
+          "collections": [],
+          "patches": [],
+          "legend": [
+            "Dynamic P Control",
+            "Target",
+            "PD Control",
+            "PID Control"
+          ],
+          "xgrid": true,
+          "ygrid": true
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "size_inches": [
+        6.4,
+        4.8
+      ],
+      "dpi": 100.0,
+      "axes": [
+        {
+          "title": "PID Control: Before vs After Optimization",
+          "xlabel": "Time [s]",
+          "ylabel": "Joint 2 Angle [deg]",
+          "xlim": [
+            -0.5,
+            10.5
+          ],
+          "ylim": [
+            -51.91743079001248,
+            100.26604659026214
+          ],
+          "xscale": "linear",
+          "yscale": "linear",
+          "aspect": "auto",
+          "lines": [
+            {
+              "array_prefix": "plot.figure_04.axis_0.line_0",
+              "label": "Before Optimization",
+              "color": [
+                0.12156862745098039,
+                0.4666666666666667,
+                0.7058823529411765
+              ],
+              "linestyle": "-",
+              "linewidth": 1.5,
+              "marker": "None"
+            },
+            {
+              "array_prefix": "plot.figure_04.axis_0.line_1",
+              "label": "After Optimization",
+              "color": [
+                1.0,
+                0.4980392156862745,
+                0.054901960784313725
+              ],
+              "linestyle": "-",
+              "linewidth": 1.5,
+              "marker": "None"
+            },
+            {
+              "array_prefix": "plot.figure_04.axis_0.line_2",
+              "label": "Target",
+              "color": "red",
+              "linestyle": "--",
+              "linewidth": 1.5,
+              "marker": "None"
+            },
+            {
+              "array_prefix": "plot.figure_04.axis_0.line_3",
+              "label": "Before Settling: 5.05 s",
+              "color": "blue",
+              "linestyle": ":",
+              "linewidth": 1.5,
+              "marker": "None"
+            },
+            {
+              "array_prefix": "plot.figure_04.axis_0.line_4",
+              "label": "After Settling: 4.55 s",
+              "color": "orange",
+              "linestyle": ":",
+              "linewidth": 1.5,
+              "marker": "None"
+            }
+          ],
+          "collections": [],
+          "patches": [
+            {
+              "array_prefix": "plot.figure_04.axis_0.patch_0",
+              "label": "2% Settling Band",
+              "facecolor": [
+                0.0,
+                0.5019607843137255,
+                0.0,
+                0.15
+              ],
+              "alpha": 0.15
+            }
+          ],
+          "legend": [
+            "Before Optimization",
+            "After Optimization",
+            "Target",
+            "2% Settling Band",
+            "Before Settling: 5.05 s",
+            "After Settling: 4.55 s"
+          ],
+          "xgrid": true,
+          "ygrid": true
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "size_inches": [
+        6.4,
+        4.8
+      ],
+      "dpi": 100.0,
+      "axes": [
+        {
+          "title": "End-Effector Position Error vs Time",
+          "xlabel": "Time [s]",
+          "ylabel": "Position Error [mm]",
+          "xlim": [
+            -0.5,
+            10.5
+          ],
+          "ylim": [
+            -22.521465725115352,
+            703.5404119179248
+          ],
+          "xscale": "linear",
+          "yscale": "linear",
+          "aspect": "auto",
+          "lines": [
+            {
+              "array_prefix": "plot.figure_05.axis_0.line_0",
+              "label": "End-Effector Position Error",
+              "color": [
+                0.12156862745098039,
+                0.4666666666666667,
+                0.7058823529411765
+              ],
+              "linestyle": "-",
+              "linewidth": 1.5,
+              "marker": "None"
+            },
+            {
+              "array_prefix": "plot.figure_05.axis_0.line_1",
+              "label": "20 mm Tolerance",
+              "color": "red",
+              "linestyle": "--",
+              "linewidth": 1.5,
+              "marker": "None"
+            },
+            {
+              "array_prefix": "plot.figure_05.axis_0.line_2",
+              "label": "Settling: 7.70 s",
+              "color": "green",
+              "linestyle": ":",
+              "linewidth": 1.5,
+              "marker": "None"
+            }
+          ],
+          "collections": [],
+          "patches": [],
+          "legend": [
+            "End-Effector Position Error",
+            "20 mm Tolerance",
+            "Settling: 7.70 s"
+          ],
+          "xgrid": true,
+          "ygrid": true
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "size_inches": [
+        6.4,
+        4.8
+      ],
+      "dpi": 100.0,
+      "axes": [
+        {
+          "title": "Straight-Line Tracking Error",
+          "xlabel": "End-Effector X Position [m]",
+          "ylabel": "Y Deviation [mm]",
+          "xlim": [
+            1.195006991711348,
+            1.3048531740616978
+          ],
+          "ylim": [
+            -0.3561030195142867,
+            0.01695728664353746
+          ],
+          "xscale": "linear",
+          "yscale": "linear",
+          "aspect": "auto",
+          "lines": [
+            {
+              "array_prefix": "plot.figure_06.axis_0.line_0",
+              "label": "Actual Y Deviation",
+              "color": "blue",
+              "linestyle": "-",
+              "linewidth": 1.5,
+              "marker": "None"
+            },
+            {
+              "array_prefix": "plot.figure_06.axis_0.line_1",
+              "label": "Ideal Trajectory",
+              "color": "red",
+              "linestyle": "--",
+              "linewidth": 1.5,
+              "marker": "None"
+            }
+          ],
+          "collections": [],
+          "patches": [],
+          "legend": [
+            "Actual Y Deviation",
+            "Ideal Trajectory"
+          ],
+          "xgrid": true,
+          "ygrid": true
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "size_inches": [
+        9.0,
+        5.0
+      ],
+      "dpi": 100.0,
+      "axes": [
+        {
+          "title": "Desired Joint Angle Trajectories",
+          "xlabel": "Time [s]",
+          "ylabel": "Joint Angle [deg]",
+          "xlim": [
+            -0.05,
+            1.05
+          ],
+          "ylim": [
+            -2.1684039661539583,
+            77.66686154207211
+          ],
+          "xscale": "linear",
+          "yscale": "linear",
+          "aspect": "auto",
+          "lines": [
+            {
+              "array_prefix": "plot.figure_07.axis_0.line_0",
+              "label": "Joint 1 Desired Angle",
+              "color": [
+                0.12156862745098039,
+                0.4666666666666667,
+                0.7058823529411765
+              ],
+              "linestyle": "-",
+              "linewidth": 2.0,
+              "marker": "None"
+            },
+            {
+              "array_prefix": "plot.figure_07.axis_0.line_1",
+              "label": "Joint 2 Desired Angle",
+              "color": [
+                1.0,
+                0.4980392156862745,
+                0.054901960784313725
+              ],
+              "linestyle": "-",
+              "linewidth": 2.0,
+              "marker": "None"
+            }
+          ],
+          "collections": [],
+          "patches": [],
+          "legend": [
+            "Joint 1 Desired Angle",
+            "Joint 2 Desired Angle"
+          ],
+          "xgrid": true,
+          "ygrid": true
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "size_inches": [
+        9.0,
+        8.0
+      ],
+      "dpi": 100.0,
+      "axes": [
+        {
+          "title": "Joint 1 Trajectory Tracking",
+          "xlabel": "",
+          "ylabel": "Joint Angle [deg]",
+          "xlim": [
+            -0.05,
+            1.05
+          ],
+          "ylim": [
+            1.3641180938015656,
+            3.4838982830061256
+          ],
+          "xscale": "linear",
+          "yscale": "linear",
+          "aspect": "auto",
+          "lines": [
+            {
+              "array_prefix": "plot.figure_08.axis_0.line_0",
+              "label": "Desired Joint 1",
+              "color": [
+                0.12156862745098039,
+                0.4666666666666667,
+                0.7058823529411765
+              ],
+              "linestyle": "--",
+              "linewidth": 2.0,
+              "marker": "None"
+            },
+            {
+              "array_prefix": "plot.figure_08.axis_0.line_1",
+              "label": "Actual Joint 1",
+              "color": [
+                1.0,
+                0.4980392156862745,
+                0.054901960784313725
+              ],
+              "linestyle": "-",
+              "linewidth": 2.0,
+              "marker": "None"
+            }
+          ],
+          "collections": [],
+          "patches": [],
+          "legend": [
+            "Desired Joint 1",
+            "Actual Joint 1"
+          ],
+          "xgrid": true,
+          "ygrid": true
+        },
+        {
+          "title": "Joint 2 Trajectory Tracking",
+          "xlabel": "Time [s]",
+          "ylabel": "Joint Angle [deg]",
+          "xlim": [
+            -0.05,
+            1.05
+          ],
+          "ylim": [
+            63.97384051732597,
+            74.5172308523826
+          ],
+          "xscale": "linear",
+          "yscale": "linear",
+          "aspect": "auto",
+          "lines": [
+            {
+              "array_prefix": "plot.figure_08.axis_1.line_0",
+              "label": "Desired Joint 2",
+              "color": [
+                0.12156862745098039,
+                0.4666666666666667,
+                0.7058823529411765
+              ],
+              "linestyle": "--",
+              "linewidth": 2.0,
+              "marker": "None"
+            },
+            {
+              "array_prefix": "plot.figure_08.axis_1.line_1",
+              "label": "Actual Joint 2",
+              "color": [
+                1.0,
+                0.4980392156862745,
+                0.054901960784313725
+              ],
+              "linestyle": "-",
+              "linewidth": 2.0,
+              "marker": "None"
+            }
+          ],
+          "collections": [],
+          "patches": [],
+          "legend": [
+            "Desired Joint 2",
+            "Actual Joint 2"
+          ],
+          "xgrid": true,
+          "ygrid": true
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "size_inches": [
+        9.0,
+        5.0
+      ],
+      "dpi": 100.0,
+      "axes": [
+        {
+          "title": "End-Effector Trajectory Tracking Error",
+          "xlabel": "Time [s]",
+          "ylabel": "Position Error [mm]",
+          "xlim": [
+            -0.05,
+            1.05
+          ],
+          "ylim": [
+            -0.7781872282599376,
+            16.341931793463573
+          ],
+          "xscale": "linear",
+          "yscale": "linear",
+          "aspect": "auto",
+          "lines": [
+            {
+              "array_prefix": "plot.figure_09.axis_0.line_0",
+              "label": "Position Tracking Error",
+              "color": [
+                0.12156862745098039,
+                0.4666666666666667,
+                0.7058823529411765
+              ],
+              "linestyle": "-",
+              "linewidth": 2.0,
+              "marker": "None"
+            }
+          ],
+          "collections": [],
+          "patches": [],
+          "legend": [
+            "Position Tracking Error"
+          ],
+          "xgrid": true,
+          "ygrid": true
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "size_inches": [
+        9.0,
+        6.0
+      ],
+      "dpi": 100.0,
+      "axes": [
+        {
+          "title": "Desired vs Actual End-Effector Trajectory",
+          "xlabel": "End-Effector X Position [m]",
+          "ylabel": "End-Effector Y Position [m]",
+          "xlim": [
+            1.1949999999999998,
+            1.3050000000000002
+          ],
+          "ylim": [
+            0.7652633475241768,
+            0.8339178589808851
+          ],
+          "xscale": "linear",
+          "yscale": "linear",
+          "aspect": 1.0,
+          "lines": [
+            {
+              "array_prefix": "plot.figure_10.axis_0.line_0",
+              "label": "Desired Trajectory",
+              "color": "r",
+              "linestyle": "--",
+              "linewidth": 2.0,
+              "marker": "None"
+            },
+            {
+              "array_prefix": "plot.figure_10.axis_0.line_1",
+              "label": "Actual PID Trajectory",
+              "color": "b",
+              "linestyle": "-",
+              "linewidth": 2.0,
+              "marker": "None"
+            }
+          ],
+          "collections": [],
+          "patches": [],
+          "legend": [
+            "Desired Trajectory",
+            "Actual PID Trajectory"
+          ],
+          "xgrid": true,
+          "ygrid": true
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "size_inches": [
+        9.0,
+        5.0
+      ],
+      "dpi": 100.0,
+      "axes": [
+        {
+          "title": "X and Y End-Effector Tracking Errors",
+          "xlabel": "Time [s]",
+          "ylabel": "Tracking Error [mm]",
+          "xlim": [
+            -0.05,
+            1.05
+          ],
+          "ylim": [
+            -0.8301239706686891,
+            16.344322615351974
+          ],
+          "xscale": "linear",
+          "yscale": "linear",
+          "aspect": "auto",
+          "lines": [
+            {
+              "array_prefix": "plot.figure_11.axis_0.line_0",
+              "label": "X Tracking Error",
+              "color": [
+                0.12156862745098039,
+                0.4666666666666667,
+                0.7058823529411765
+              ],
+              "linestyle": "-",
+              "linewidth": 2.0,
+              "marker": "None"
+            },
+            {
+              "array_prefix": "plot.figure_11.axis_0.line_1",
+              "label": "Y Tracking Error",
+              "color": [
+                1.0,
+                0.4980392156862745,
+                0.054901960784313725
+              ],
+              "linestyle": "-",
+              "linewidth": 2.0,
+              "marker": "None"
+            },
+            {
+              "array_prefix": "plot.figure_11.axis_0.line_2",
+              "label": "_child2",
+              "color": "black",
+              "linestyle": "--",
+              "linewidth": 1.0,
+              "marker": "None"
+            }
+          ],
+          "collections": [],
+          "patches": [],
+          "legend": [
+            "X Tracking Error",
+            "Y Tracking Error"
+          ],
+          "xgrid": true,
+          "ygrid": true
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "size_inches": [
+        9.0,
+        5.0
+      ],
+      "dpi": 100.0,
+      "axes": [
+        {
+          "title": "Holding the Final Target Position",
+          "xlabel": "Time [s]",
+          "ylabel": "Position Error [mm]",
+          "xlim": [
+            0.95,
+            2.05
+          ],
+          "ylim": [
+            -0.7432710316710287,
+            16.790703813896783
+          ],
+          "xscale": "linear",
+          "yscale": "linear",
+          "aspect": "auto",
+          "lines": [
+            {
+              "array_prefix": "plot.figure_12.axis_0.line_0",
+              "label": "Position Error During Hold",
+              "color": [
+                0.12156862745098039,
+                0.4666666666666667,
+                0.7058823529411765
+              ],
+              "linestyle": "-",
+              "linewidth": 2.0,
+              "marker": "None"
+            }
+          ],
+          "collections": [],
+          "patches": [],
+          "legend": [
+            "Position Error During Hold"
+          ],
+          "xgrid": true,
+          "ygrid": true
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "size_inches": [
+        9.0,
+        5.0
+      ],
+      "dpi": 100.0,
+      "axes": [
+        {
+          "title": "PID vs PID + Feedforward Tracking Error",
+          "xlabel": "Time [s]",
+          "ylabel": "Position Tracking Error [mm]",
+          "xlim": [
+            -0.05,
+            1.05
+          ],
+          "ylim": [
+            -0.7781872282599376,
+            16.341931793463573
+          ],
+          "xscale": "linear",
+          "yscale": "linear",
+          "aspect": "auto",
+          "lines": [
+            {
+              "array_prefix": "plot.figure_13.axis_0.line_0",
+              "label": "PID Only",
+              "color": [
+                0.12156862745098039,
+                0.4666666666666667,
+                0.7058823529411765
+              ],
+              "linestyle": "-",
+              "linewidth": 2.0,
+              "marker": "None"
+            },
+            {
+              "array_prefix": "plot.figure_13.axis_0.line_1",
+              "label": "PID + Feedforward",
+              "color": [
+                1.0,
+                0.4980392156862745,
+                0.054901960784313725
+              ],
+              "linestyle": "-",
+              "linewidth": 2.0,
+              "marker": "None"
+            }
+          ],
+          "collections": [],
+          "patches": [],
+          "legend": [
+            "PID Only",
+            "PID + Feedforward"
+          ],
+          "xgrid": true,
+          "ygrid": true
+        }
+      ]
+    },
+    {
+      "number": 14,
+      "size_inches": [
+        9.0,
+        5.0
+      ],
+      "dpi": 100.0,
+      "axes": [
+        {
+          "title": "Quintic vs Constant-Velocity Trajectory",
+          "xlabel": "Time [s]",
+          "ylabel": "Desired X Velocity [mm/s]",
+          "xlim": [
+            -0.05,
+            1.05
+          ],
+          "ylim": [
+            -9.375,
+            196.875
+          ],
+          "xscale": "linear",
+          "yscale": "linear",
+          "aspect": "auto",
+          "lines": [
+            {
+              "array_prefix": "plot.figure_14.axis_0.line_0",
+              "label": "Quintic Trajectory",
+              "color": [
+                0.12156862745098039,
+                0.4666666666666667,
+                0.7058823529411765
+              ],
+              "linestyle": "-",
+              "linewidth": 2.0,
+              "marker": "None"
+            },
+            {
+              "array_prefix": "plot.figure_14.axis_0.line_1",
+              "label": "Previous Constant Velocity",
+              "color": "C0",
+              "linestyle": "--",
+              "linewidth": 1.5,
+              "marker": "None"
+            }
+          ],
+          "collections": [],
+          "patches": [],
+          "legend": [
+            "Quintic Trajectory",
+            "Previous Constant Velocity"
+          ],
+          "xgrid": true,
+          "ygrid": true
+        }
+      ]
+    },
+    {
+      "number": 15,
+      "size_inches": [
+        9.0,
+        5.0
+      ],
+      "dpi": 100.0,
+      "axes": [
+        {
+          "title": "Quintic Trajectory: Final Target Holding",
+          "xlabel": "Time [s]",
+          "ylabel": "Position Error [mm]",
+          "xlim": [
+            0.95,
+            2.05
+          ],
+          "ylim": [
+            -0.010700431118696504,
+            0.2804458551814761
+          ],
+          "xscale": "linear",
+          "yscale": "linear",
+          "aspect": "auto",
+          "lines": [
+            {
+              "array_prefix": "plot.figure_15.axis_0.line_0",
+              "label": "Quintic Trajectory + PID + FF",
+              "color": [
+                0.12156862745098039,
+                0.4666666666666667,
+                0.7058823529411765
+              ],
+              "linestyle": "-",
+              "linewidth": 2.0,
+              "marker": "None"
+            }
+          ],
+          "collections": [],
+          "patches": [],
+          "legend": [
+            "Quintic Trajectory + PID + FF"
+          ],
+          "xgrid": true,
+          "ygrid": true
+        }
+      ]
+    },
+    {
+      "number": 16,
+      "size_inches": [
+        10.0,
+        5.0
+      ],
+      "dpi": 100.0,
+      "axes": [
+        {
+          "title": "Tracking Error: Constant vs Quintic Trajectory",
+          "xlabel": "Time [s]",
+          "ylabel": "Position Error [mm]",
+          "xlim": [
+            -0.05,
+            1.05
+          ],
+          "ylim": [
+            -0.6837337939239623,
+            14.35840967240809
+          ],
+          "xscale": "linear",
+          "yscale": "linear",
+          "aspect": "auto",
+          "lines": [
+            {
+              "array_prefix": "plot.figure_16.axis_0.line_0",
+              "label": "Constant Velocity + PID + FF",
+              "color": [
+                0.12156862745098039,
+                0.4666666666666667,
+                0.7058823529411765
+              ],
+              "linestyle": "-",
+              "linewidth": 2.0,
+              "marker": "None"
+            },
+            {
+              "array_prefix": "plot.figure_16.axis_0.line_1",
+              "label": "Quintic Trajectory + PID + FF",
+              "color": [
+                1.0,
+                0.4980392156862745,
+                0.054901960784313725
+              ],
+              "linestyle": "-",
+              "linewidth": 2.0,
+              "marker": "None"
+            }
+          ],
+          "collections": [],
+          "patches": [],
+          "legend": [
+            "Constant Velocity + PID + FF",
+            "Quintic Trajectory + PID + FF"
+          ],
+          "xgrid": true,
+          "ygrid": true
+        }
+      ]
+    }
+  ]
+}

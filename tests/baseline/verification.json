@@ -1,0 +1,14 @@
+{
+  "source_commit": "6788e27933cbf79a8565c657a391b47c2b464ad3",
+  "independent_replay_exact_match": true,
+  "replay_output": "NOTICE environment.json differs; version, source and commit metadata are informational.\nPASS bundles match (exact)",
+  "injected_0_01_mm_difference_rejected": true,
+  "difference_detection_output": "DIFF arrays.constant.pid_ff_error_mm: max_abs_difference=0.0099999999999997868\nFAIL arrays.constant.pid_ff_error_mm: values differ\nNOTICE environment.json differs; version, source and commit metadata are informational.\nFAIL 1 comparison issue(s)",
+  "existing_reference_overwrite_refused": true,
+  "array_count": 241,
+  "reconstructed_tracking_and_hold_error_histories_match": true,
+  "tracking_to_hold_state_continuity_verified": true,
+  "artifact_hashes_verified": true,
+  "existing_project_files_unchanged": true,
+  "capture_and_compare_syntax_passed": true
+}

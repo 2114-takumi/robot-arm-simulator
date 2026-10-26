@@ -1,0 +1,2 @@
+# Preserve frozen reference bytes and their recorded SHA-256 hashes.
+tests/baseline/reference/** -text whitespace=cr-at-eol

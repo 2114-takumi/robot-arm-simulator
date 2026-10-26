@@ -1,76 +1,23 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+from functools import partial
 from matplotlib.animation import FuncAnimation
+from robot_arm.kinematics import (
+    forward_kinematics,
+    inverse_kinematics,
+    calculate_jacobian,
+    calculate_jacobian_dot,
+)
+from robot_arm.metrics import calculate_settling_time
+from robot_arm.simulation import simulate_pid, simulate_rk2
+from robot_arm.visualization import update
 
 L1 = 1.0
 L2 = 0.8
 
 theta1 = np.deg2rad(30)
 theta2 = np.deg2rad(-45)
-
-def forward_kinematics(theta1, theta2, L1, L2):
-    x1 = L1 * np.cos(theta1)
-    y1 = L1 * np.sin(theta1)
-
-    x2 = x1 + L2 * np.cos(theta1 + theta2)
-    y2 = y1 + L2 * np.sin(theta1 + theta2)
-
-    return x1, y1, x2, y2
-
-def inverse_kinematics(x, y, L1, L2):
-    # Distance from the origin to the target
-    r = np.hypot(x, y)
-
-    # Check whether the target is reachable
-    if not (abs(L1 - L2) <= r <= L1 + L2):
-        raise ValueError("Target is outside the reachable workspace")
-
-    # Calculate the second joint angle
-    cos_theta2 = (
-        r**2 - L1**2 - L2**2
-    ) / (2 * L1 * L2)
-    cos_theta2 = np.clip(cos_theta2, -1.0, 1.0)
-    theta2 = np.arccos(cos_theta2)
-
-    # Calculate the first joint angle
-    alpha = np.arctan2(y, x)
-    beta = np.arctan2(
-        L2 * np.sin(theta2),
-        L1 + L2 * np.cos(theta2)
-    )
-    theta1 = alpha - beta
-
-    return theta1, theta2
-
-def calculate_jacobian(theta1, theta2, L1, L2):
-    j11 = -L1 * np.sin(theta1) - L2 * np.sin(theta1 + theta2)
-    j12 = -L2 * np.sin(theta1 + theta2)
-    j21 = L1 * np.cos(theta1) + L2 * np.cos(theta1 + theta2)
-    j22 = L2 * np.cos(theta1 + theta2)
-
-    J = np.array([
-        [j11, j12],
-        [j21, j22]
-    ])
-
-    return J
-
-# 2%整定時間を計算する関数
-def calculate_settling_time(times, angles, target):
-    initial_error = abs(target - angles[0])
-    threshold = 0.02 * initial_error
-
-    for i in range(len(angles)):
-        # この時刻以降、すべて許容範囲内にあるか
-        remaining_errors = np.abs(
-            np.array(angles[i:]) - target
-        )
-
-        if np.all(remaining_errors <= threshold):
-            return times[i]
-
-    return None
 
 # 目標座標
 target_x = 1.2
@@ -156,21 +103,17 @@ plt.title("2-Link Robot Arm")
 plt.xlim(-2, 2)
 plt.ylim(-2, 2)
 
-def update(frame):
-    theta1_new = theta1_pid_history[frame]
-    theta2_new = after_history[frame]
-    x1, y1, x2, y2 = forward_kinematics(
-        theta1_new, theta2_new, L1, L2
-    )
-    line.set_data(
-        [0, x1, x2],
-        [0, y1, y2]
-    )
-    return line,
+animation_update = partial(
+    update,
+    get_angle_histories=lambda: (theta1_pid_history, after_history),
+    L1=L1,
+    L2=L2,
+    line=line,
+)
 
 ani = FuncAnimation(
     plt.gcf(),
-    update,
+    animation_update,
     frames=range(0, 201, 2),
     interval=100,
     repeat=False
@@ -618,37 +561,17 @@ print(
 print(f"History Length: {len(theta1_pid_history)}")
 
 
-def simulate_pid(kd, kp=Kp_torque, ki=Ki_torque):
-    theta = theta2
-    omega = 0.0
-    integral = 0.0
-
-    history = [theta]
-
-    for step in range(200):
-        error = theta2_ik - theta
-
-        integral += error * dt
-
-        tau = (
-            kp * error
-            + ki * integral
-            - kd * omega
-        )
-
-        tau += joint2_disturbance
-
-        alpha = (tau - b * omega) / J
-
-        omega += alpha * dt
-        theta += omega * dt
-
-        history.append(theta)
-
-    return history
-
-
-test_history = simulate_pid(0.5)
+test_history = simulate_pid(
+    0.5,
+    kp=Kp_torque,
+    ki=Ki_torque,
+    initial_angle=theta2,
+    target_angle=theta2_ik,
+    dt=dt,
+    inertia=J,
+    damping=b,
+    disturbance=joint2_disturbance,
+)
 
 print(
     "Simulation matches:",
@@ -665,7 +588,17 @@ min_cost = float("inf")
 print("\n--- PID Gain Comparison ---")
 
 for kd in kd_values:
-    history = simulate_pid(kd)
+    history = simulate_pid(
+        kd,
+        kp=Kp_torque,
+        ki=Ki_torque,
+        initial_angle=theta2,
+        target_angle=theta2_ik,
+        dt=dt,
+        inertia=J,
+        damping=b,
+        disturbance=joint2_disturbance,
+    )
 
     max_angle = np.max(history)
     overshoot = max(0.0, max_angle - theta2_ik)
@@ -731,7 +664,17 @@ print("\n--- P and D Gain Comparison ---")
 
 for kp in kp_values:
     for kd in kd_values_2d:
-        history = simulate_pid(kd, kp)
+        history = simulate_pid(
+            kd,
+            kp,
+            ki=Ki_torque,
+            initial_angle=theta2,
+            target_angle=theta2_ik,
+            dt=dt,
+            inertia=J,
+            damping=b,
+            disturbance=joint2_disturbance,
+        )
 
         max_angle = np.max(history)
         overshoot = max(0.0, max_angle - theta2_ik)
@@ -791,7 +734,17 @@ for kp in kp_values_3d:
     for ki in ki_values_3d:
         for kd in kd_values_3d:
 
-            history = simulate_pid(kd, kp, ki)
+            history = simulate_pid(
+                kd,
+                kp,
+                ki,
+                initial_angle=theta2,
+                target_angle=theta2_ik,
+                dt=dt,
+                inertia=J,
+                damping=b,
+                disturbance=joint2_disturbance,
+            )
 
             max_angle = np.max(history)
             overshoot = max(0.0, max_angle - theta2_ik)
@@ -838,7 +791,15 @@ if best_gains_3d is not None:
     best_kp, best_ki, best_kd = best_gains_3d
 
     best_history = simulate_pid(
-        best_kd, best_kp, best_ki
+        best_kd,
+        best_kp,
+        best_ki,
+        initial_angle=theta2,
+        target_angle=theta2_ik,
+        dt=dt,
+        inertia=J,
+        damping=b,
+        disturbance=joint2_disturbance,
     )
 
     best_max_angle = np.max(best_history)
@@ -877,14 +838,26 @@ if best_gains_3d is not None:
 before_history = simulate_pid(
     kd=0.5,
     kp=1.0,
-    ki=0.5
+    ki=0.5,
+    initial_angle=theta2,
+    target_angle=theta2_ik,
+    dt=dt,
+    inertia=J,
+    damping=b,
+    disturbance=joint2_disturbance,
 )
 
 # 最適化後のPID制御
 after_history = simulate_pid(
     kd=best_gains_3d[2],
     kp=best_gains_3d[0],
-    ki=best_gains_3d[1]
+    ki=best_gains_3d[1],
+    initial_angle=theta2,
+    target_angle=theta2_ik,
+    dt=dt,
+    inertia=J,
+    damping=b,
+    disturbance=joint2_disturbance,
 )
 
 fig_compare, ax_compare = plt.subplots()
@@ -1575,47 +1548,21 @@ print(f"RK2 Final Position: ({x_rk2:.6f}, {y_rk2:.6f}) m")
 
 # --- RK2 Time Step Accuracy Test ---
 
-def simulate_rk2(test_dt):
-    theta = np.array([theta1_ik, theta2_ik], dtype=float)
-    steps = int(round(1.0 / test_dt))
-
-    for _ in range(steps):
-        # Velocity at current configuration
-        J_current = calculate_jacobian(
-            theta[0], theta[1], L1, L2
-        )
-        omega_current = np.linalg.solve(
-            J_current, desired_velocity
-        )
-
-        # Predict midpoint
-        theta_mid = theta + 0.5 * test_dt * omega_current
-
-        # Velocity at midpoint
-        J_mid = calculate_jacobian(
-            theta_mid[0], theta_mid[1], L1, L2
-        )
-        omega_mid = np.linalg.solve(
-            J_mid, desired_velocity
-        )
-
-        # RK2 update
-        theta += test_dt * omega_mid
-
-    # Final end-effector position
-    _, _, x, y = forward_kinematics(
-        theta[0], theta[1], L1, L2
-    )
-
-    return np.hypot(x - ideal_x, y - ideal_y) * 1000
-
-
 print("\n--- RK2 Time Step Accuracy Test ---")
 
 previous_error = None
 
 for test_dt in [0.05, 0.025, 0.0125]:
-    error = simulate_rk2(test_dt)
+    error = simulate_rk2(
+        test_dt,
+        initial_theta1=theta1_ik,
+        initial_theta2=theta2_ik,
+        L1=L1,
+        L2=L2,
+        desired_velocity=desired_velocity,
+        ideal_x=ideal_x,
+        ideal_y=ideal_y,
+    )
 
     print(f"dt = {test_dt:.4f} s, Error = {error:.8f} mm")
 
@@ -2574,31 +2521,6 @@ for k in [0, 10, 20]:
 
 
 # --- Step 5-19: Quintic Feedforward Torque ---
-
-def calculate_jacobian_dot(theta1, theta2, omega1, omega2, L1, L2):
-
-    theta12 = theta1 + theta2
-    omega12 = omega1 + omega2
-
-    jdot11 = (
-        -L1 * np.cos(theta1) * omega1
-        -L2 * np.cos(theta12) * omega12
-    )
-
-    jdot12 = -L2 * np.cos(theta12) * omega12
-
-    jdot21 = (
-        -L1 * np.sin(theta1) * omega1
-        -L2 * np.sin(theta12) * omega12
-    )
-
-    jdot22 = -L2 * np.sin(theta12) * omega12
-
-    return np.array([
-        [jdot11, jdot12],
-        [jdot21, jdot22]
-    ])
-
 
 quintic_alpha_history = []
 quintic_torque_ff_history = []

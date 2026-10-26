@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "status": "complete",
+  "created_utc": "2026-10-26T04:51:04.973807+00:00",
+  "git_commit": "6788e27933cbf79a8565c657a391b47c2b464ad3",
+  "git_branch": "master",
+  "git_status_at_capture": "?? tests/",
+  "source_file": "main.py",
+  "source_sha256": "bc68090990b1312532bfe0b7cbe9aad3fcbc047e236dc279ef5c8077cec2f9d6",
+  "source_git_blob": "abe63fce71cf3c84b6b5de141710bc54d4cd0886",
+  "source_matches_commit": true,
+  "versions": {
+    "Python": "3.13.17",
+    "NumPy": "2.5.4",
+    "Matplotlib": "3.11.2"
+  },
+  "parameters": {
+    "L1_m": 1.0,
+    "L2_m": 0.8,
+    "tracking_kp": 1.2,
+    "tracking_ki": 0.3,
+    "tracking_kd": 0.4,
+    "tracking_inertia_kg_m2": 0.1,
+    "tracking_damping_nm_s_rad": 0.05,
+    "hold_dt_s": 0.05,
+    "quintic_duration_s": 1.0
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_executable": "C:\\Users\\代替機.千葉大学生協\\Documents\\robot-arm-simulator\\.venv\\Scripts\\python.exe",
+  "backend": "Agg",
+  "execution": {
+    "method": "runpy.run_path on the unchanged source; line/return tracing copies observations",
+    "gui_window_lift_attributes": "no-op dummy window on the Agg manager",
+    "plt_show": "no-op",
+    "image_exports": [
+      {
+        "requested": "assets/trajectory_tracking_comparison.png",
+        "actual": "trajectory_tracking_comparison.png",
+        "dpi": 200,
+        "bbox_inches": "tight"
+      }
+    ],
+    "interactive_gui_validated": false
+  },
+  "protected_sha256_before": {
+    "main.py": "bc68090990b1312532bfe0b7cbe9aad3fcbc047e236dc279ef5c8077cec2f9d6",
+    "README.md": "e6a6cd459ad9970e0f9a04ec80ab3aa9fec79fea584be4f07ad0d886cb1f6954",
+    "assets\\trajectory_tracking_comparison.png": "e74a6baa47be7a90ca876b6e4bd3e50124407c82cc641f6a6a93dc27b3f8c037"
+  },
+  "protected_sha256_after": {
+    "main.py": "bc68090990b1312532bfe0b7cbe9aad3fcbc047e236dc279ef5c8077cec2f9d6",
+    "README.md": "e6a6cd459ad9970e0f9a04ec80ab3aa9fec79fea584be4f07ad0d886cb1f6954",
+    "assets\\trajectory_tracking_comparison.png": "e74a6baa47be7a90ca876b6e4bd3e50124407c82cc641f6a6a93dc27b3f8c037"
+  },
+  "array_count": 241,
+  "figure_count": 16,
+  "checkpoint_lines": {
+    "kinematic_p": 309,
+    "gain_1d": 723,
+    "gain_2d": 781,
+    "fixed_target": 1647,
+    "constant_tracking_end": 2277,
+    "constant_hold_end": 2439,
+    "quintic_tracking_end": 2784,
+    "quintic_hold_end": 2892
+  },
+  "observed_loop_lines": {
+    "constant.pid_ff": 2225,
+    "constant.hold": 2322,
+    "quintic.pid_ff": 2680,
+    "quintic.hold": 2800,
+    "comparison.constant": 2950
+  },
+  "pid_sweep_run_count": 56,
+  "rk2_run_count": 3,
+  "artifact_sha256": {
+    "arrays.npz": "57861b3978c25e01011a1ab40a9d32dcf8cbf56bcb5bbf787cf0b9ecb7fa5077",
+    "arrays_manifest.json": "e592f626fa27ba4cbd4eb959052ab30ca462cab111c8553d0b030158a17c89a7",
+    "plots.json": "b41c32c3ef6fff1fb1947614d55229b61ca6cca159efb82c48d10ab423bb6373",
+    "stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout.txt": "3a5a61e03b55e5b11482acc5482cc20a297acafee6d6d6ed573216ab0c67918f",
+    "summary.json": "93cc7be1fc41d7b17e9fb692699f6d4fec54d6a6951dd2077badc618d09a07f0",
+    "trajectory_tracking_comparison.png": "e74a6baa47be7a90ca876b6e4bd3e50124407c82cc641f6a6a93dc27b3f8c037"
+  }
+}

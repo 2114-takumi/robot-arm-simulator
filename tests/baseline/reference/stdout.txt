@@ -1,0 +1,389 @@
+Target distance: 1.442 m
+Reachable: True
+IK theta2: 74.04 deg
+IK theta1: 1.46 deg
+
+--- Jacobian at Target Position ---
+[[-0.8        -0.77451272]
+ [ 1.2         0.20032485]]
+Shape: (2, 2)
+IK End Effector: x=1.200000, y=0.800000
+Position Error: 0.0000000000 m
+End Effector: x=1.6387660648156934, y=0.2929447639179833
+Joint 1 Error: -28.54 deg
+Joint 2 Error: 119.04 deg
+Joint 1 Command: -57.08 deg/s
+Joint 2 Command: 238.08 deg/s
+Next theta1: 27.15 deg
+Next theta2: -33.10 deg
+Joint 2 Settling Time: 1.90 s
+P Control theta1: 1.46 deg
+P Control theta2: 74.03 deg
+Torque: 1.978 N m
+Angular Acceleration: 19.776 rad/s^2
+Angular Velocity: 0.989 rad/s
+Dynamic theta2: -42.17 deg
+P Control Damping Ratio: 0.079
+PD Control Damping Ratio: 0.870
+Critical Kd: 0.582
+Dynamic P: Not settled within 10 s
+PD: Not settled within 10 s
+PID Final Angle: 74.08 deg
+PID Final Error: -0.05 deg
+PID Settling Time: 5.05 s
+PID Maximum Angle: 93.35 deg
+PID Overshoot: 19.31 deg
+
+--- Joint 1 Initial State ---
+Initial Angle: 30.00 deg
+Target Angle: 1.46 deg
+Initial Velocity: 0.00 rad/s
+Integral Error: 0.00
+
+--- Joint 1 PID Result ---
+Final Angle: 0.87 deg
+Target Angle: 1.46 deg
+Final Error: 0.59 deg
+History Length: 201
+Simulation matches: True
+
+--- PID Gain Comparison ---
+Kd=0.400 | Cost=0.993
+Kd=0.400 | Overshoot=21.73 deg | Settling Time=4.50 s
+Kd=0.410 | Cost=0.986
+Kd=0.410 | Overshoot=21.26 deg | Settling Time=4.55 s
+Kd=0.420 | Cost=0.981
+Kd=0.420 | Overshoot=20.86 deg | Settling Time=4.60 s
+Kd=0.430 | Cost=0.982
+Kd=0.430 | Overshoot=20.50 deg | Settling Time=4.70 s
+Kd=0.440 | Cost=0.980
+Kd=0.440 | Overshoot=20.18 deg | Settling Time=4.75 s
+Kd=0.450 | Cost=0.979
+Kd=0.450 | Overshoot=19.95 deg | Settling Time=4.80 s
+Kd=0.460 | Cost=0.979
+Kd=0.460 | Overshoot=19.75 deg | Settling Time=4.85 s
+Kd=0.470 | Cost=0.980
+Kd=0.470 | Overshoot=19.58 deg | Settling Time=4.90 s
+Kd=0.480 | Cost=0.981
+Kd=0.480 | Overshoot=19.46 deg | Settling Time=4.95 s
+Kd=0.490 | Cost=0.984
+Kd=0.490 | Overshoot=19.36 deg | Settling Time=5.00 s
+Kd=0.500 | Cost=0.988
+Kd=0.500 | Overshoot=19.31 deg | Settling Time=5.05 s
+Kd=0.510 | Cost=0.992
+Kd=0.510 | Overshoot=19.28 deg | Settling Time=5.10 s
+Kd=0.520 | Cost=0.997
+Kd=0.520 | Overshoot=19.27 deg | Settling Time=5.15 s
+Kd=0.530 | Cost=1.002
+Kd=0.530 | Overshoot=19.28 deg | Settling Time=5.20 s
+Kd=0.540 | Cost=1.008
+Kd=0.540 | Overshoot=19.30 deg | Settling Time=5.25 s
+Kd=0.550 | Cost=1.014
+Kd=0.550 | Overshoot=19.35 deg | Settling Time=5.30 s
+
+--- Best D Gain ---
+Best Kd: 0.520
+Minimum Overshoot: 19.27 deg
+
+--- Best D Gain by Cost ---
+Best Kd by Cost: 0.460
+Minimum Cost: 0.979
+
+--- P and D Gain Comparison ---
+Kp=0.8 | Kd=0.4 | Overshoot=26.60 deg | Settling Time=4.15 s
+Kp=0.8 | Kd=0.5 | Overshoot=25.55 deg | Settling Time=4.75 s
+Kp=0.8 | Kd=0.6 | Overshoot=26.35 deg | Settling Time=5.20 s
+Kp=1.0 | Kd=0.4 | Overshoot=21.73 deg | Settling Time=4.50 s
+Kp=1.0 | Kd=0.5 | Overshoot=19.31 deg | Settling Time=5.05 s
+Kp=1.0 | Kd=0.6 | Overshoot=19.71 deg | Settling Time=5.50 s
+Kp=1.2 | Kd=0.4 | Overshoot=19.63 deg | Settling Time=4.50 s
+Kp=1.2 | Kd=0.5 | Overshoot=15.50 deg | Settling Time=5.20 s
+Kp=1.2 | Kd=0.6 | Overshoot=15.23 deg | Settling Time=5.75 s
+
+--- Best P and D Gains ---
+Best Kp: 1.20
+Best Kd: 0.50
+Minimum Cost: 0.907
+
+--- PID 3D Gain Optimization ---
+Kp=0.8 | Ki=0.3 | Kd=0.4 | Cost=0.979
+Kp=0.8 | Ki=0.3 | Kd=0.5 | Cost=1.052
+Kp=0.8 | Ki=0.3 | Kd=0.6 | Cost=1.149
+Kp=0.8 | Ki=0.5 | Kd=0.4 | Cost=1.080
+Kp=0.8 | Ki=0.5 | Kd=0.5 | Cost=1.114
+Kp=0.8 | Ki=0.5 | Kd=0.6 | Cost=1.179
+Kp=0.8 | Ki=0.7 | Kd=0.4 | Cost=1.219
+Kp=0.8 | Ki=0.7 | Kd=0.5 | Cost=1.378
+Kp=0.8 | Ki=0.7 | Kd=0.6 | Cost=1.492
+Kp=1.0 | Ki=0.3 | Kd=0.4 | Cost=0.875
+Kp=1.0 | Ki=0.3 | Kd=0.5 | Cost=0.932
+Kp=1.0 | Ki=0.3 | Kd=0.6 | Cost=1.038
+Kp=1.0 | Ki=0.5 | Kd=0.4 | Cost=0.993
+Kp=1.0 | Ki=0.5 | Kd=0.5 | Cost=0.988
+Kp=1.0 | Ki=0.5 | Kd=0.6 | Cost=1.043
+Kp=1.0 | Ki=0.7 | Kd=0.4 | Cost=1.075
+Kp=1.0 | Ki=0.7 | Kd=0.5 | Cost=1.054
+Kp=1.0 | Ki=0.7 | Kd=0.6 | Cost=1.096
+Kp=1.2 | Ki=0.3 | Kd=0.4 | Cost=0.771
+Kp=1.2 | Ki=0.3 | Kd=0.5 | Cost=0.814
+Kp=1.2 | Ki=0.3 | Kd=0.6 | Cost=0.927
+Kp=1.2 | Ki=0.5 | Kd=0.4 | Cost=0.941
+Kp=1.2 | Ki=0.5 | Kd=0.5 | Cost=0.907
+Kp=1.2 | Ki=0.5 | Kd=0.6 | Cost=0.956
+Kp=1.2 | Ki=0.7 | Kd=0.4 | Cost=1.031
+Kp=1.2 | Ki=0.7 | Kd=0.5 | Cost=0.965
+Kp=1.2 | Ki=0.7 | Kd=0.6 | Cost=0.982
+
+--- Best PID Gains ---
+Best Kp: 1.20
+Best Ki: 0.30
+Best Kd: 0.40
+Minimum Cost: 0.771
+
+--- Optimized PID Performance ---
+Overshoot: 12.64 deg
+Settling Time: 4.55 s
+Final Error: -0.53 deg
+
+--- End Effector Position Error ---
+Target: (1.2000, 0.8000) m
+Actual: (1.2010, 0.7896) m
+Position Error: 0.010481 m
+Position Error: 10.48 mm
+
+--- End-Effector Settling Time ---
+Position Settling Time: 7.70 s
+Final Position Error: 10.48 mm
+
+--- Jacobian Position Error Prediction ---
+Joint 1 Error: -0.5869 deg
+Joint 2 Error: 0.5311 deg
+Predicted X Error: 1.02 mm
+Predicted Y Error: -10.44 mm
+Predicted Position Error: 10.48 mm
+Actual Position Error: 10.48 mm
+
+--- Jacobian Approximation Accuracy ---
+Actual X Error: 0.9627 mm
+Actual Y Error: -10.4370 mm
+Predicted X Error: 1.0152 mm
+Predicted Y Error: -10.4355 mm
+Approximation Error: 0.0526 mm
+
+--- Large Angle Error Test ---
+Joint 1 Change: +10.00 deg
+Joint 2 Change: -10.00 deg
+Actual Displacement: 174.31 mm
+Predicted Displacement: 174.53 mm
+Approximation Error: 15.22 mm
+
+--- Second-Order Error Prediction ---
+Second-Order Prediction: 15.2309 mm
+Measured Approximation Error: 15.2180 mm
+
+--- End-Effector Velocity ---
+Time: 1.00 s
+Joint 1 Angular Velocity: -0.0725 rad/s
+Joint 2 Angular Velocity: 0.3379 rad/s
+End-Effector Vx: -0.2163 m/s
+End-Effector Vy: -0.0276 m/s
+End-Effector Speed: 0.2181 m/s
+
+--- Velocity Calculation Comparison ---
+Jacobian Vx: -0.216325 m/s
+Finite Difference Vx: -0.216744 m/s
+Jacobian Vy: -0.027619 m/s
+Finite Difference Vy: -0.028983 m/s
+Velocity Difference: 0.001426 m/s
+
+--- Time Interval Accuracy Test ---
+Subdivisions:  1, dt: 0.0500 s, Velocity Error: 0.00142600 m/s
+Subdivisions:  2, dt: 0.0250 s, Velocity Error: 0.00071318 m/s
+Subdivisions:  5, dt: 0.0100 s, Velocity Error: 0.00028532 m/s
+Subdivisions: 10, dt: 0.0050 s, Velocity Error: 0.00014267 m/s
+Subdivisions: 20, dt: 0.0025 s, Velocity Error: 0.00007133 m/s
+
+--- Inverse Velocity Kinematics ---
+Desired Vx: 0.1000 m/s
+Desired Vy: 0.0000 m/s
+Joint 1 Velocity: 0.0260 rad/s
+Joint 2 Velocity: -0.1560 rad/s
+Calculated Vx: 0.1000 m/s
+Calculated Vy: 0.0000 m/s
+
+--- Inverse Velocity Motion Test ---
+Duration: 0.050 s
+Predicted X: 5.0000 mm
+Actual X: 4.9949 mm
+Predicted Y: 0.0000 mm
+Actual Y: -0.0164 mm
+
+--- Updated Jacobian Straight-Line Motion ---
+Duration: 1.00 s
+Ideal Final Position: (1.300000, 0.800000) m
+Actual Final Position: (1.299860, 0.799661) m
+Final Position Error: 0.3668 mm
+Maximum Y Deviation: 0.3391 mm
+
+--- Time Step vs Tracking Accuracy ---
+dt: 0.050 s, Steps:  20, Position Error: 0.3668 mm
+dt: 0.025 s, Steps:  40, Position Error: 0.1838 mm
+dt: 0.010 s, Steps: 100, Position Error: 0.0736 mm
+dt: 0.005 s, Steps: 200, Position Error: 0.0368 mm
+
+--- Euler vs RK2 Comparison ---
+Time Step: 0.050 s
+Steps: 20
+Euler Error: 0.366843 mm
+RK2 Error: 0.000847 mm
+RK2 Final Position: (1.299999, 0.800000) m
+
+--- RK2 Time Step Accuracy Test ---
+dt = 0.0500 s, Error = 0.00084728 mm
+dt = 0.0250 s, Error = 0.00021255 mm
+Error Reduction Ratio = 3.986
+dt = 0.0125 s, Error = 0.00005323 mm
+Error Reduction Ratio = 3.993
+
+--- Inverse Kinematics Function Test ---
+Target: (1.200, 0.800) m
+Joint Angles: (1.460, 74.038) deg
+Position Error: 0.000000 mm
+Target: (1.300, 0.800) m
+Joint Angles: (3.388, 64.453) deg
+Position Error: 0.000000 mm
+
+--- Desired Joint Trajectory ---
+Number of Points: 21
+Time: 0.00 s | Theta1: 1.460 deg | Theta2: 74.038 deg
+Time: 0.50 s | Theta1: 2.312 deg | Theta2: 69.417 deg
+Time: 1.00 s | Theta1: 3.388 deg | Theta2: 64.453 deg
+
+--- PID Trajectory Tracking ---
+Final Desired Angles: [ 3.38754464 64.45308553]
+Final Actual Angles: [ 3.23314473 64.9560579 ]
+Final Angular Errors: [ 0.15439991 -0.50297237]
+Final Position Error: 4.4431 mm
+
+--- End-Effector Tracking Error ---
+Maximum Error: 15.5637 mm
+Mean Error: 10.1167 mm
+Final Error: 4.4431 mm
+
+--- X and Y Tracking Error ---
+Maximum Error Time: 0.350 s
+X Error at Maximum: 15.5637 mm
+Y Error at Maximum: -0.0495 mm
+Final X Error: 4.3575 mm
+Final Y Error: 0.8683 mm
+
+--- Jacobian Tracking Error Analysis ---
+Joint 1 Contribution [mm]: [-2.15582947  3.50322288]
+Joint 2 Contribution [mm]: [ 6.50410165 -2.64889589]
+Predicted X/Y Error [mm]: [4.34827218 0.85432699]
+Actual X/Y Error [mm]: [4.35745326 0.8682608 ]
+Approximation Difference [mm]: 0.01668662148439608
+
+--- Desired Joint Angular Velocities ---
+Time: 0.00 s | Omega1: 1.4923 deg/s | Omega2: -8.9390 deg/s
+Time: 0.50 s | Omega1: 1.9188 deg/s | Omega2: -9.5629 deg/s
+Time: 1.00 s | Omega1: 2.3953 deg/s | Omega2: -10.3195 deg/s
+
+--- Actual vs Desired Angular Velocities ---
+
+Time Interval: 0.00 - 0.05 s
+Desired Velocity [deg/s]: [ 1.4923 -8.939 ]
+Actual Average Velocity [deg/s]: [0. 0.]
+
+Time Interval: 0.45 - 0.50 s
+Desired Velocity [deg/s]: [ 1.8743 -9.4953]
+Actual Average Velocity [deg/s]: [  2.0169 -10.8124]
+
+Time Interval: 0.95 - 1.00 s
+Desired Velocity [deg/s]: [  2.3447 -10.2363]
+Actual Average Velocity [deg/s]: [  2.5303 -11.4722]
+
+--- Feedforward Torque Calculation ---
+
+Time: 0.00 s
+Desired Acceleration [deg/s^2]: [ 0.8196 -1.1532]
+Feedforward Torque [Nm]: [ 0.002733 -0.009813]
+
+Time: 0.50 s
+Desired Acceleration [deg/s^2]: [ 0.8957 -1.3646]
+Feedforward Torque [Nm]: [ 0.003238 -0.010727]
+
+Time: 1.00 s
+Desired Acceleration [deg/s^2]: [ 1.012  -1.6632]
+Feedforward Torque [Nm]: [ 0.003857 -0.011908]
+
+--- Velocity at 1.0 s ---
+Joint Angular Velocities [deg/s]: [  2.5838 -11.5719]
+End-Effector Velocity [m/s]: [ 0.113559 -0.002327]
+End-Effector Speed [mm/s]: 113.5824
+
+--- Holding Final Target ---
+Error at 1.0 s: 0.0537 mm
+Maximum Hold Error: 15.9937 mm
+Error at 2.0 s: 1.7713 mm
+
+--- PID vs PID + Feedforward ---
+PID Only Maximum Error: 15.5637 mm
+PID + FF Maximum Error: 13.6747 mm
+PID Only Mean Error: 10.1167 mm
+PID + FF Mean Error: 7.4047 mm
+PID Only Final Error: 4.4431 mm
+PID + FF Final Error: 0.0537 mm
+
+--- Quintic Trajectory ---
+Time: 0.00 s | X: 1.2000 m | Vx: 0.0000 mm/s | Ax: 0.0000 m/s^2
+Time: 0.50 s | X: 1.2500 m | Vx: 187.5000 mm/s | Ax: 0.0000 m/s^2
+Time: 1.00 s | X: 1.3000 m | Vx: 0.0000 mm/s | Ax: 0.0000 m/s^2
+Maximum Desired Speed: 187.5000 mm/s
+
+--- Quintic Joint Trajectory ---
+
+Time: 0.00 s
+Desired Angles [deg]: [ 1.4605 74.038 ]
+Desired Angular Velocities [deg/s]: [ 0. -0.]
+
+Time: 0.50 s
+Desired Angles [deg]: [ 2.3116 69.4171]
+Desired Angular Velocities [deg/s]: [  3.5978 -17.9305]
+
+Time: 1.00 s
+Desired Angles [deg]: [ 3.3875 64.4531]
+Desired Angular Velocities [deg/s]: [ 0. -0.]
+
+--- Quintic Feedforward Torque ---
+
+Time: 0.00 s
+Desired Angular Acceleration [deg/s^2]: [ 0. -0.]
+Feedforward Torque [Nm]: [ 0. -0.]
+
+Time: 0.50 s
+Desired Angular Acceleration [deg/s^2]: [ 3.1487 -4.7968]
+Feedforward Torque [Nm]: [ 0.008635 -0.024019]
+
+Time: 1.00 s
+Desired Angular Acceleration [deg/s^2]: [ 0. -0.]
+Feedforward Torque [Nm]: [ 0. -0.]
+
+--- Quintic PID + Feedforward Tracking ---
+Maximum Error: 0.3029 mm
+Mean Error: 0.1647 mm
+Final Error: 0.2672 mm
+Final End-Effector Speed: 0.1818 mm/s
+
+--- Quintic Final Target Holding ---
+Error at 1.0 s: 0.2672 mm
+Maximum Hold Error: 0.2672 mm
+Error at 2.0 s: 0.0216 mm
+End-Effector Speed at 2.0 s: 0.0271 mm/s
+Saved graph: assets\trajectory_tracking_comparison.png
+
+--- Step 5-22: Tracking Error Comparison ---
+Constant Maximum Error: 13.6747 mm
+Quintic Maximum Error: 0.3029 mm
+Constant Mean Error: 7.4047 mm
+Quintic Mean Error: 0.1647 mm

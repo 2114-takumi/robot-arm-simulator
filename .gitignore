@@ -8,3 +8,12 @@ __pycache__/
 
 # VS Code settings
 .vscode/
+
+# Local regression captures; keep tests/baseline/reference/ in Git
+tests/baseline/candidate*/
+tests/baseline/_verification/
+
+# Historical per-step diagnostics; checkpoint and latest GUI records are kept
+tests/baseline/step_6_[3-9]_verification.json
+tests/baseline/step_6_10_verification.json
+tests/baseline/step_6_9_gui_verification.json

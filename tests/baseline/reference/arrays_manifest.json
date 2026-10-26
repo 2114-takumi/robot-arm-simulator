@@ -1,0 +1,1966 @@
+{
+  "kinematic_p.time_s": {
+    "shape": [
+      101
+    ],
+    "dtype": "float64",
+    "unit": "s",
+    "source": "time_history"
+  },
+  "kinematic_p.theta1_rad": {
+    "shape": [
+      101
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "theta1_history"
+  },
+  "kinematic_p.theta2_rad": {
+    "shape": [
+      101
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "theta2_history"
+  },
+  "fixed_target.time_s": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "s",
+    "source": "dynamic_time_history"
+  },
+  "fixed_target.p_theta2_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "dynamic_theta_history"
+  },
+  "fixed_target.pd_theta2_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "pd_theta_history"
+  },
+  "fixed_target.pid_theta2_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "pid_theta_history"
+  },
+  "fixed_target.pid_theta1_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "theta1_pid_history"
+  },
+  "fixed_target.before_theta2_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "before_history"
+  },
+  "fixed_target.after_theta2_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "after_history"
+  },
+  "fixed_target.position_error_mm": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "mm",
+    "source": "fixed_target_error_history"
+  },
+  "velocity_motion.x_m": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "m",
+    "source": "line_x_history"
+  },
+  "velocity_motion.y_m": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "m",
+    "source": "line_y_history"
+  },
+  "constant.time_s": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "s",
+    "source": "trajectory_time"
+  },
+  "constant.desired_theta1_rad": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "theta1_desired_history"
+  },
+  "constant.desired_theta2_rad": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "theta2_desired_history"
+  },
+  "constant.desired_omega_rad_s": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad/s",
+    "source": "desired_joint_velocity_history"
+  },
+  "constant.desired_alpha_rad_s2": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad/s^2",
+    "source": "alpha_desired_array"
+  },
+  "constant.feedforward_torque_nm": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "N*m",
+    "source": "torque_ff_array"
+  },
+  "constant.pid_only_theta1_rad": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "theta1_actual_history"
+  },
+  "constant.pid_only_theta2_rad": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "theta2_actual_history"
+  },
+  "constant.pid_only_error_mm": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "mm",
+    "source": "trajectory_pid_error_history"
+  },
+  "constant.pid_ff_error_mm": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "mm",
+    "source": "trajectory_ff_error_history"
+  },
+  "constant.pid_only_x_error_mm": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "mm",
+    "source": "x_error_history"
+  },
+  "constant.pid_only_y_error_mm": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "mm",
+    "source": "y_error_history"
+  },
+  "constant.hold_time_s": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "s",
+    "source": "hold_time_history"
+  },
+  "constant.hold_error_mm": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "mm",
+    "source": "hold_error_history"
+  },
+  "constant.tip_velocity_at_1s_m_s": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "m/s",
+    "source": "tip_velocity_start"
+  },
+  "quintic.visualization_time_s": {
+    "shape": [
+      101
+    ],
+    "dtype": "float64",
+    "unit": "s",
+    "source": "quintic_time"
+  },
+  "quintic.visualization_x_m": {
+    "shape": [
+      101
+    ],
+    "dtype": "float64",
+    "unit": "m",
+    "source": "quintic_x"
+  },
+  "quintic.visualization_vx_m_s": {
+    "shape": [
+      101
+    ],
+    "dtype": "float64",
+    "unit": "m/s",
+    "source": "quintic_vx"
+  },
+  "quintic.visualization_ax_m_s2": {
+    "shape": [
+      101
+    ],
+    "dtype": "float64",
+    "unit": "m/s^2",
+    "source": "quintic_ax"
+  },
+  "quintic.time_s": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "s",
+    "source": "quintic_tracking_time"
+  },
+  "quintic.desired_theta_rad": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "quintic_theta_history"
+  },
+  "quintic.desired_omega_rad_s": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad/s",
+    "source": "quintic_omega_history"
+  },
+  "quintic.desired_alpha_rad_s2": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad/s^2",
+    "source": "quintic_alpha_history"
+  },
+  "quintic.feedforward_torque_nm": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "N*m",
+    "source": "quintic_torque_ff_history"
+  },
+  "quintic.pid_ff_error_mm": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "mm",
+    "source": "quintic_position_error_history"
+  },
+  "quintic.tip_velocity_at_1s_m_s": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "m/s",
+    "source": "quintic_tip_velocity_final"
+  },
+  "quintic.hold_time_s": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "s",
+    "source": "hold_time_q"
+  },
+  "quintic.hold_error_mm": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "mm",
+    "source": "hold_error_q"
+  },
+  "quintic.tip_velocity_at_2s_m_s": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "m/s",
+    "source": "tip_velocity_final_q"
+  },
+  "comparison.constant.time_s": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "s",
+    "source": "comparison_time"
+  },
+  "comparison.constant.error_mm": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "mm",
+    "source": "constant_error_history"
+  },
+  "comparison.constant.desired_theta_rad": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "constant_theta_desired"
+  },
+  "comparison.constant.desired_omega_rad_s": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad/s",
+    "source": "constant_omega_desired"
+  },
+  "comparison.constant.desired_alpha_rad_s2": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad/s^2",
+    "source": "constant_alpha_desired"
+  },
+  "comparison.constant.feedforward_torque_nm": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "N*m",
+    "source": "constant_torque_ff"
+  },
+  "constant.tracking_final.theta_rad": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "constant_tracking_end:theta_ff"
+  },
+  "constant.tracking_final.omega_rad_s": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad/s",
+    "source": "constant_tracking_end:omega_ff"
+  },
+  "constant.tracking_final.integral_rad_times_s": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad*s",
+    "source": "constant_tracking_end:integral_ff"
+  },
+  "constant.tracking_final.previous_error_rad": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "constant_tracking_end:previous_error_ff"
+  },
+  "constant.hold_final.theta_rad": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "constant_hold_end:theta_ff"
+  },
+  "constant.hold_final.omega_rad_s": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad/s",
+    "source": "constant_hold_end:omega_ff"
+  },
+  "constant.hold_final.integral_rad_times_s": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad*s",
+    "source": "constant_hold_end:integral_ff"
+  },
+  "constant.hold_final.previous_error_rad": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "constant_hold_end:previous_error_ff"
+  },
+  "quintic.tracking_final.theta_rad": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "quintic_tracking_end:quintic_actual_theta"
+  },
+  "quintic.tracking_final.omega_rad_s": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad/s",
+    "source": "quintic_tracking_end:quintic_actual_omega"
+  },
+  "quintic.tracking_final.integral_rad_times_s": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad*s",
+    "source": "quintic_tracking_end:quintic_integral_error"
+  },
+  "quintic.tracking_final.previous_error_rad": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "quintic_tracking_end:quintic_previous_error"
+  },
+  "quintic.hold_final.theta_rad": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "quintic_hold_end:hold_theta_q"
+  },
+  "quintic.hold_final.omega_rad_s": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad/s",
+    "source": "quintic_hold_end:hold_omega_q"
+  },
+  "quintic.hold_final.integral_rad_times_s": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad*s",
+    "source": "quintic_hold_end:hold_integral_q"
+  },
+  "quintic.hold_final.previous_error_rad": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "quintic_hold_end:hold_previous_error_q"
+  },
+  "constant.pid_ff.state_history.theta_rad": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "copies observed at loop start; hold includes the terminal state"
+  },
+  "constant.pid_ff.state_history.omega_rad_s": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad/s",
+    "source": "copies observed at loop start; hold includes the terminal state"
+  },
+  "constant.pid_ff.state_history.integral_rad_times_s": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad*s",
+    "source": "copies observed at loop start; hold includes the terminal state"
+  },
+  "constant.pid_ff.state_history.previous_error_rad": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "copies observed at loop start; hold includes the terminal state"
+  },
+  "constant.hold.state_history.theta_rad": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "copies observed at loop start; hold includes the terminal state"
+  },
+  "constant.hold.state_history.omega_rad_s": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad/s",
+    "source": "copies observed at loop start; hold includes the terminal state"
+  },
+  "constant.hold.state_history.integral_rad_times_s": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad*s",
+    "source": "copies observed at loop start; hold includes the terminal state"
+  },
+  "constant.hold.state_history.previous_error_rad": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "copies observed at loop start; hold includes the terminal state"
+  },
+  "quintic.pid_ff.state_history.theta_rad": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "copies observed at loop start; hold includes the terminal state"
+  },
+  "quintic.pid_ff.state_history.omega_rad_s": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad/s",
+    "source": "copies observed at loop start; hold includes the terminal state"
+  },
+  "quintic.pid_ff.state_history.integral_rad_times_s": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad*s",
+    "source": "copies observed at loop start; hold includes the terminal state"
+  },
+  "quintic.pid_ff.state_history.previous_error_rad": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "copies observed at loop start; hold includes the terminal state"
+  },
+  "quintic.hold.state_history.theta_rad": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "copies observed at loop start; hold includes the terminal state"
+  },
+  "quintic.hold.state_history.omega_rad_s": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad/s",
+    "source": "copies observed at loop start; hold includes the terminal state"
+  },
+  "quintic.hold.state_history.integral_rad_times_s": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad*s",
+    "source": "copies observed at loop start; hold includes the terminal state"
+  },
+  "quintic.hold.state_history.previous_error_rad": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "copies observed at loop start; hold includes the terminal state"
+  },
+  "comparison.constant.state_history.theta_rad": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "copies observed at loop start; hold includes the terminal state"
+  },
+  "comparison.constant.state_history.omega_rad_s": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad/s",
+    "source": "copies observed at loop start; hold includes the terminal state"
+  },
+  "comparison.constant.state_history.integral_rad_times_s": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad*s",
+    "source": "copies observed at loop start; hold includes the terminal state"
+  },
+  "comparison.constant.state_history.previous_error_rad": {
+    "shape": [
+      21,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "copies observed at loop start; hold includes the terminal state"
+  },
+  "fixed_target.jacobian_target_m_rad": {
+    "shape": [
+      2,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "m/rad",
+    "source": "fixed_target:J_target"
+  },
+  "fixed_target.final_joint_error_rad": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "fixed_target:delta_theta"
+  },
+  "fixed_target.predicted_position_error_m": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "m",
+    "source": "fixed_target:delta_position"
+  },
+  "fixed_target.tip_velocity_at_1s_m_s": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "m/s",
+    "source": "fixed_target:velocity"
+  },
+  "fixed_target.finite_difference_velocity_at_1s_m_s": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "m/s",
+    "source": "fixed_target:velocity_fd"
+  },
+  "fixed_target.rk2_final_theta_rad": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "fixed_target:theta_rk2"
+  },
+  "gain_sweep.run_000.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_001.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_002.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_003.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_004.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_005.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_006.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_007.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_008.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_009.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_010.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_011.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_012.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_013.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_014.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_015.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_016.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_017.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_018.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_019.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_020.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_021.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_022.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_023.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_024.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_025.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_026.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_027.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_028.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_029.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_030.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_031.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_032.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_033.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_034.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_035.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_036.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_037.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_038.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_039.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_040.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_041.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_042.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_043.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_044.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_045.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_046.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_047.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_048.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_049.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_050.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_051.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_052.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_053.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_054.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "gain_sweep.run_055.theta_rad": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_pid return history"
+  },
+  "rk2.run_000.final_theta_rad": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_rk2 return state"
+  },
+  "rk2.run_001.final_theta_rad": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_rk2 return state"
+  },
+  "rk2.run_002.final_theta_rad": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "rad",
+    "source": "simulate_rk2 return state"
+  },
+  "plot.figure_01.axis_0.line_0.x": {
+    "shape": [
+      3
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_01.axis_0.line_0.y": {
+    "shape": [
+      3
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_01.axis_0.line_1.x": {
+    "shape": [
+      3
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_01.axis_0.line_1.y": {
+    "shape": [
+      3
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_01.axis_0.collection_0.offsets": {
+    "shape": [
+      1,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib collection offsets"
+  },
+  "plot.figure_01.axis_0.collection_0.facecolors": {
+    "shape": [
+      1,
+      4
+    ],
+    "dtype": "float64",
+    "unit": "RGBA",
+    "source": "Matplotlib collection colors"
+  },
+  "plot.figure_02.axis_0.line_0.x": {
+    "shape": [
+      101
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_02.axis_0.line_0.y": {
+    "shape": [
+      101
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_02.axis_0.line_1.x": {
+    "shape": [
+      101
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_02.axis_0.line_1.y": {
+    "shape": [
+      101
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_02.axis_0.line_2.x": {
+    "shape": [
+      2
+    ],
+    "dtype": "int64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_02.axis_0.line_2.y": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_02.axis_0.line_3.x": {
+    "shape": [
+      2
+    ],
+    "dtype": "int64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_02.axis_0.line_3.y": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_03.axis_0.line_0.x": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_03.axis_0.line_0.y": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_03.axis_0.line_1.x": {
+    "shape": [
+      2
+    ],
+    "dtype": "int64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_03.axis_0.line_1.y": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_03.axis_0.line_2.x": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_03.axis_0.line_2.y": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_03.axis_0.line_3.x": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_03.axis_0.line_3.y": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_04.axis_0.line_0.x": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_04.axis_0.line_0.y": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_04.axis_0.line_1.x": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_04.axis_0.line_1.y": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_04.axis_0.line_2.x": {
+    "shape": [
+      2
+    ],
+    "dtype": "int64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_04.axis_0.line_2.y": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_04.axis_0.line_3.x": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_04.axis_0.line_3.y": {
+    "shape": [
+      2
+    ],
+    "dtype": "int64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_04.axis_0.line_4.x": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_04.axis_0.line_4.y": {
+    "shape": [
+      2
+    ],
+    "dtype": "int64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_04.axis_0.patch_0.vertices": {
+    "shape": [
+      5,
+      2
+    ],
+    "dtype": "float64",
+    "unit": "patch coordinates",
+    "source": "Matplotlib patch path"
+  },
+  "plot.figure_04.axis_0.patch_0.transform": {
+    "shape": [
+      3,
+      3
+    ],
+    "dtype": "float64",
+    "unit": "patch transform",
+    "source": "Matplotlib patch transform"
+  },
+  "plot.figure_05.axis_0.line_0.x": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_05.axis_0.line_0.y": {
+    "shape": [
+      201
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_05.axis_0.line_1.x": {
+    "shape": [
+      2
+    ],
+    "dtype": "int64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_05.axis_0.line_1.y": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_05.axis_0.line_2.x": {
+    "shape": [
+      2
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_05.axis_0.line_2.y": {
+    "shape": [
+      2
+    ],
+    "dtype": "int64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_06.axis_0.line_0.x": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_06.axis_0.line_0.y": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_06.axis_0.line_1.x": {
+    "shape": [
+      2
+    ],
+    "dtype": "int64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_06.axis_0.line_1.y": {
+    "shape": [
+      2
+    ],
+    "dtype": "int64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_07.axis_0.line_0.x": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_07.axis_0.line_0.y": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_07.axis_0.line_1.x": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_07.axis_0.line_1.y": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_08.axis_0.line_0.x": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_08.axis_0.line_0.y": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_08.axis_0.line_1.x": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_08.axis_0.line_1.y": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_08.axis_1.line_0.x": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_08.axis_1.line_0.y": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_08.axis_1.line_1.x": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_08.axis_1.line_1.y": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_09.axis_0.line_0.x": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_09.axis_0.line_0.y": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_10.axis_0.line_0.x": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_10.axis_0.line_0.y": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_10.axis_0.line_1.x": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_10.axis_0.line_1.y": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_11.axis_0.line_0.x": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_11.axis_0.line_0.y": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_11.axis_0.line_1.x": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_11.axis_0.line_1.y": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_11.axis_0.line_2.x": {
+    "shape": [
+      2
+    ],
+    "dtype": "int64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_11.axis_0.line_2.y": {
+    "shape": [
+      2
+    ],
+    "dtype": "int64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_12.axis_0.line_0.x": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_12.axis_0.line_0.y": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_13.axis_0.line_0.x": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_13.axis_0.line_0.y": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_13.axis_0.line_1.x": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_13.axis_0.line_1.y": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_14.axis_0.line_0.x": {
+    "shape": [
+      101
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_14.axis_0.line_0.y": {
+    "shape": [
+      101
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_14.axis_0.line_1.x": {
+    "shape": [
+      2
+    ],
+    "dtype": "int64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_14.axis_0.line_1.y": {
+    "shape": [
+      2
+    ],
+    "dtype": "int64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_15.axis_0.line_0.x": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_15.axis_0.line_0.y": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_16.axis_0.line_0.x": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_16.axis_0.line_0.y": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "plot.figure_16.axis_0.line_1.x": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D xdata"
+  },
+  "plot.figure_16.axis_0.line_1.y": {
+    "shape": [
+      21
+    ],
+    "dtype": "float64",
+    "unit": "axis units",
+    "source": "Matplotlib Line2D ydata"
+  },
+  "animation.frame_000.x_m": {
+    "shape": [
+      3
+    ],
+    "dtype": "float64",
+    "unit": "m",
+    "source": "original update(frame)"
+  },
+  "animation.frame_000.y_m": {
+    "shape": [
+      3
+    ],
+    "dtype": "float64",
+    "unit": "m",
+    "source": "original update(frame)"
+  },
+  "animation.frame_020.x_m": {
+    "shape": [
+      3
+    ],
+    "dtype": "float64",
+    "unit": "m",
+    "source": "original update(frame)"
+  },
+  "animation.frame_020.y_m": {
+    "shape": [
+      3
+    ],
+    "dtype": "float64",
+    "unit": "m",
+    "source": "original update(frame)"
+  },
+  "animation.frame_100.x_m": {
+    "shape": [
+      3
+    ],
+    "dtype": "float64",
+    "unit": "m",
+    "source": "original update(frame)"
+  },
+  "animation.frame_100.y_m": {
+    "shape": [
+      3
+    ],
+    "dtype": "float64",
+    "unit": "m",
+    "source": "original update(frame)"
+  },
+  "animation.frame_200.x_m": {
+    "shape": [
+      3
+    ],
+    "dtype": "float64",
+    "unit": "m",
+    "source": "original update(frame)"
+  },
+  "animation.frame_200.y_m": {
+    "shape": [
+      3
+    ],
+    "dtype": "float64",
+    "unit": "m",
+    "source": "original update(frame)"
+  }
+}

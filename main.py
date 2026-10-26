@@ -13,6 +13,269 @@ from robot_arm.metrics import calculate_settling_time
 from robot_arm.simulation import simulate_pid, simulate_rk2
 from robot_arm.visualization import update
 
+
+def run_inverse_kinematics_test(*, targets, L1, L2):
+    print("\n--- Inverse Kinematics Function Test ---")
+
+    for x, y in targets:
+        th1, th2 = inverse_kinematics(x, y, L1, L2)
+        _, _, actual_x, actual_y = forward_kinematics(
+            th1, th2, L1, L2
+        )
+        error = np.hypot(actual_x - x, actual_y - y)
+
+        print(f"Target: ({x:.3f}, {y:.3f}) m")
+        print(
+            f"Joint Angles: "
+            f"({np.rad2deg(th1):.3f}, "
+            f"{np.rad2deg(th2):.3f}) deg"
+        )
+        print(f"Position Error: {error * 1000:.6f} mm")
+
+
+def run_rk2_timestep_comparison(
+    *,
+    initial_theta1,
+    initial_theta2,
+    L1,
+    L2,
+    desired_velocity,
+    ideal_x,
+    ideal_y,
+    time_steps,
+):
+    print("\n--- RK2 Time Step Accuracy Test ---")
+
+    previous_error = None
+
+    for test_dt in time_steps:
+        error = simulate_rk2(
+            test_dt,
+            initial_theta1=initial_theta1,
+            initial_theta2=initial_theta2,
+            L1=L1,
+            L2=L2,
+            desired_velocity=desired_velocity,
+            ideal_x=ideal_x,
+            ideal_y=ideal_y,
+        )
+
+        print(f"dt = {test_dt:.4f} s, Error = {error:.8f} mm")
+
+        if previous_error is not None:
+            print(f"Error Reduction Ratio = {previous_error / error:.3f}")
+
+        previous_error = error
+
+
+def run_rk2_single_comparison(
+    *,
+    initial_theta1,
+    initial_theta2,
+    L1,
+    L2,
+    desired_velocity,
+    ideal_x,
+    ideal_y,
+    line_final_error,
+    rk2_dt,
+    rk2_steps,
+):
+    # Initial joint angles
+    theta_rk2 = np.array([
+        initial_theta1,
+        initial_theta2
+    ], dtype=float)
+
+    for step in range(rk2_steps):
+
+        # Step 1: Joint velocities at the current configuration
+        J_current = calculate_jacobian(
+            theta_rk2[0], theta_rk2[1], L1, L2
+        )
+
+        omega_current = np.linalg.solve(
+            J_current, desired_velocity
+        )
+
+        # Step 2: Predict the midpoint configuration
+        theta_mid = theta_rk2 + 0.5 * rk2_dt * omega_current
+
+        # Step 3: Joint velocities at the midpoint
+        J_mid = calculate_jacobian(
+            theta_mid[0], theta_mid[1], L1, L2
+        )
+
+        omega_mid = np.linalg.solve(
+            J_mid, desired_velocity
+        )
+
+        # Step 4: Update using midpoint velocities
+        theta_rk2 += rk2_dt * omega_mid
+
+    # Calculate final end-effector position
+    _, _, x_rk2, y_rk2 = forward_kinematics(
+        theta_rk2[0], theta_rk2[1], L1, L2
+    )
+
+    # Calculate final position error
+    rk2_error = np.hypot(
+        x_rk2 - ideal_x,
+        y_rk2 - ideal_y
+    )
+
+    print("\n--- Euler vs RK2 Comparison ---")
+    print(f"Time Step: {rk2_dt:.3f} s")
+    print(f"Steps: {rk2_steps}")
+    print(f"Euler Error: {line_final_error * 1000:.6f} mm")
+    print(f"RK2 Error: {rk2_error * 1000:.6f} mm")
+    print(f"RK2 Final Position: ({x_rk2:.6f}, {y_rk2:.6f}) m")
+
+    return theta_rk2, rk2_error
+
+
+def run_euler_timestep_comparison(
+    *,
+    initial_theta1,
+    initial_theta2,
+    L1,
+    L2,
+    desired_velocity,
+    ideal_x,
+    ideal_y,
+    time_steps,
+):
+    print("\n--- Time Step vs Tracking Accuracy ---")
+
+    # Test different time steps
+    for test_dt in time_steps:
+
+        # Reset joint angles to the target configuration
+        theta1_test = initial_theta1
+        theta2_test = initial_theta2
+
+        # Keep the total duration at 1 second
+        steps = int(round(1.0 / test_dt))
+
+        # Simulate straight-line motion
+        for step in range(steps):
+
+            # Jacobian at the current configuration
+            J_test = calculate_jacobian(
+                theta1_test, theta2_test, L1, L2
+            )
+
+            # Required joint angular velocities
+            omega_test = np.linalg.solve(
+                J_test, desired_velocity
+            )
+
+            # Update joint angles
+            theta1_test += omega_test[0] * test_dt
+            theta2_test += omega_test[1] * test_dt
+
+        # Calculate final end-effector position
+        _, _, x_test, y_test = forward_kinematics(
+            theta1_test, theta2_test, L1, L2
+        )
+
+        # Calculate final position error
+        error_test = np.hypot(
+            x_test - ideal_x,
+            y_test - ideal_y
+        )
+
+        print(
+            f"dt: {test_dt:.3f} s, "
+            f"Steps: {steps:3d}, "
+            f"Position Error: {error_test * 1000:.4f} mm"
+        )
+
+
+def run_euler_straight_line_motion(
+    *,
+    initial_theta1,
+    initial_theta2,
+    L1,
+    L2,
+    desired_velocity,
+    target_x,
+    target_y,
+    line_dt,
+    line_steps,
+):
+    # Initial joint angles
+    theta1_line = initial_theta1
+    theta2_line = initial_theta2
+
+    # Save end-effector positions
+    line_x_history = []
+    line_y_history = []
+
+    # Initial position
+    _, _, x_line, y_line = forward_kinematics(
+        theta1_line, theta2_line, L1, L2
+    )
+
+    line_x_history.append(x_line)
+    line_y_history.append(y_line)
+
+    # Update Jacobian and joint angles at every step
+    for step in range(line_steps):
+
+        # Jacobian at the current configuration
+        J_line = calculate_jacobian(
+            theta1_line, theta2_line, L1, L2
+        )
+
+        # Joint velocities required for horizontal motion
+        omega_line = np.linalg.solve(
+            J_line, desired_velocity
+        )
+
+        # Update joint angles
+        theta1_line += omega_line[0] * line_dt
+        theta2_line += omega_line[1] * line_dt
+
+        # Calculate new end-effector position
+        _, _, x_line, y_line = forward_kinematics(
+            theta1_line, theta2_line, L1, L2
+        )
+
+        # Save trajectory
+        line_x_history.append(x_line)
+        line_y_history.append(y_line)
+
+    # Ideal final position
+    ideal_x = target_x + desired_velocity[0] * line_steps * line_dt
+    ideal_y = target_y + desired_velocity[1] * line_steps * line_dt
+
+    # Final position error
+    line_final_error = np.hypot(
+        x_line - ideal_x,
+        y_line - ideal_y
+    )
+
+    print("\n--- Updated Jacobian Straight-Line Motion ---")
+    print(f"Duration: {line_steps * line_dt:.2f} s")
+    print(f"Ideal Final Position: ({ideal_x:.6f}, {ideal_y:.6f}) m")
+    print(f"Actual Final Position: ({x_line:.6f}, {y_line:.6f}) m")
+    print(f"Final Position Error: {line_final_error * 1000:.4f} mm")
+    print(f"Maximum Y Deviation: {np.max(np.abs(np.array(line_y_history) - target_y)) * 1000:.4f} mm")
+
+    return (
+        line_x_history,
+        line_y_history,
+        ideal_x,
+        ideal_y,
+        line_final_error,
+        theta1_line,
+        theta2_line,
+        x_line,
+        y_line,
+    )
+
+
 L1 = 1.0
 L2 = 0.8
 
@@ -1345,68 +1608,31 @@ print(f"Actual Y: {actual_displacement[1] * 1000:.4f} mm")
 
 # --- Straight-Line Motion Using Updated Jacobian ---
 
-# Initial joint angles
-theta1_line = theta1_ik
-theta2_line = theta2_ik
-
 # Simulation settings
 line_dt = 0.05
 line_steps = 20
 
-# Save end-effector positions
-line_x_history = []
-line_y_history = []
-
-# Initial position
-_, _, x_line, y_line = forward_kinematics(
-    theta1_line, theta2_line, L1, L2
+(
+    line_x_history,
+    line_y_history,
+    ideal_x,
+    ideal_y,
+    line_final_error,
+    theta1_line,
+    theta2_line,
+    x_line,
+    y_line,
+) = run_euler_straight_line_motion(
+    initial_theta1=theta1_ik,
+    initial_theta2=theta2_ik,
+    L1=L1,
+    L2=L2,
+    desired_velocity=desired_velocity,
+    target_x=target_x,
+    target_y=target_y,
+    line_dt=line_dt,
+    line_steps=line_steps,
 )
-
-line_x_history.append(x_line)
-line_y_history.append(y_line)
-
-# Update Jacobian and joint angles at every step
-for step in range(line_steps):
-
-    # Jacobian at the current configuration
-    J_line = calculate_jacobian(
-        theta1_line, theta2_line, L1, L2
-    )
-
-    # Joint velocities required for horizontal motion
-    omega_line = np.linalg.solve(
-        J_line, desired_velocity
-    )
-
-    # Update joint angles
-    theta1_line += omega_line[0] * line_dt
-    theta2_line += omega_line[1] * line_dt
-
-    # Calculate new end-effector position
-    _, _, x_line, y_line = forward_kinematics(
-        theta1_line, theta2_line, L1, L2
-    )
-
-    # Save trajectory
-    line_x_history.append(x_line)
-    line_y_history.append(y_line)
-
-# Ideal final position
-ideal_x = target_x + desired_velocity[0] * line_steps * line_dt
-ideal_y = target_y + desired_velocity[1] * line_steps * line_dt
-
-# Final position error
-line_final_error = np.hypot(
-    x_line - ideal_x,
-    y_line - ideal_y
-)
-
-print("\n--- Updated Jacobian Straight-Line Motion ---")
-print(f"Duration: {line_steps * line_dt:.2f} s")
-print(f"Ideal Final Position: ({ideal_x:.6f}, {ideal_y:.6f}) m")
-print(f"Actual Final Position: ({x_line:.6f}, {y_line:.6f}) m")
-print(f"Final Position Error: {line_final_error * 1000:.4f} mm")
-print(f"Maximum Y Deviation: {np.max(np.abs(np.array(line_y_history) - target_y)) * 1000:.4f} mm")
 
 # --- Straight-Line Tracking Error Visualization ---
 
@@ -1443,150 +1669,55 @@ ax_line.set_title("Straight-Line Tracking Error")
 
 ax_line.grid(True)
 ax_line.legend()
-print("\n--- Time Step vs Tracking Accuracy ---")
-
-# Test different time steps
-for test_dt in [0.05, 0.025, 0.01, 0.005]:
-
-    # Reset joint angles to the target configuration
-    theta1_test = theta1_ik
-    theta2_test = theta2_ik
-
-    # Keep the total duration at 1 second
-    steps = int(round(1.0 / test_dt))
-
-    # Simulate straight-line motion
-    for step in range(steps):
-
-        # Jacobian at the current configuration
-        J_test = calculate_jacobian(
-            theta1_test, theta2_test, L1, L2
-        )
-
-        # Required joint angular velocities
-        omega_test = np.linalg.solve(
-            J_test, desired_velocity
-        )
-
-        # Update joint angles
-        theta1_test += omega_test[0] * test_dt
-        theta2_test += omega_test[1] * test_dt
-
-    # Calculate final end-effector position
-    _, _, x_test, y_test = forward_kinematics(
-        theta1_test, theta2_test, L1, L2
-    )
-
-    # Calculate final position error
-    error_test = np.hypot(
-        x_test - ideal_x,
-        y_test - ideal_y
-    )
-
-    print(
-        f"dt: {test_dt:.3f} s, "
-        f"Steps: {steps:3d}, "
-        f"Position Error: {error_test * 1000:.4f} mm"
-    )
+run_euler_timestep_comparison(
+    initial_theta1=theta1_ik,
+    initial_theta2=theta2_ik,
+    L1=L1,
+    L2=L2,
+    desired_velocity=desired_velocity,
+    ideal_x=ideal_x,
+    ideal_y=ideal_y,
+    time_steps=(0.05, 0.025, 0.01, 0.005),
+)
 
 
 # --- RK2 Midpoint Method Test ---
-
-# Initial joint angles
-theta_rk2 = np.array([
-    theta1_ik,
-    theta2_ik
-], dtype=float)
 
 # Use the same time step as the original Euler method
 rk2_dt = 0.05
 rk2_steps = 20
 
-for step in range(rk2_steps):
-
-    # Step 1: Joint velocities at the current configuration
-    J_current = calculate_jacobian(
-        theta_rk2[0], theta_rk2[1], L1, L2
-    )
-
-    omega_current = np.linalg.solve(
-        J_current, desired_velocity
-    )
-
-    # Step 2: Predict the midpoint configuration
-    theta_mid = theta_rk2 + 0.5 * rk2_dt * omega_current
-
-    # Step 3: Joint velocities at the midpoint
-    J_mid = calculate_jacobian(
-        theta_mid[0], theta_mid[1], L1, L2
-    )
-
-    omega_mid = np.linalg.solve(
-        J_mid, desired_velocity
-    )
-
-    # Step 4: Update using midpoint velocities
-    theta_rk2 += rk2_dt * omega_mid
-
-# Calculate final end-effector position
-_, _, x_rk2, y_rk2 = forward_kinematics(
-    theta_rk2[0], theta_rk2[1], L1, L2
+theta_rk2, rk2_error = run_rk2_single_comparison(
+    initial_theta1=theta1_ik,
+    initial_theta2=theta2_ik,
+    L1=L1,
+    L2=L2,
+    desired_velocity=desired_velocity,
+    ideal_x=ideal_x,
+    ideal_y=ideal_y,
+    line_final_error=line_final_error,
+    rk2_dt=rk2_dt,
+    rk2_steps=rk2_steps,
 )
-
-# Calculate final position error
-rk2_error = np.hypot(
-    x_rk2 - ideal_x,
-    y_rk2 - ideal_y
-)
-
-print("\n--- Euler vs RK2 Comparison ---")
-print(f"Time Step: {rk2_dt:.3f} s")
-print(f"Steps: {rk2_steps}")
-print(f"Euler Error: {line_final_error * 1000:.6f} mm")
-print(f"RK2 Error: {rk2_error * 1000:.6f} mm")
-print(f"RK2 Final Position: ({x_rk2:.6f}, {y_rk2:.6f}) m")
 
 # --- RK2 Time Step Accuracy Test ---
 
-print("\n--- RK2 Time Step Accuracy Test ---")
+run_rk2_timestep_comparison(
+    initial_theta1=theta1_ik,
+    initial_theta2=theta2_ik,
+    L1=L1,
+    L2=L2,
+    desired_velocity=desired_velocity,
+    ideal_x=ideal_x,
+    ideal_y=ideal_y,
+    time_steps=(0.05, 0.025, 0.0125),
+)
 
-previous_error = None
-
-for test_dt in [0.05, 0.025, 0.0125]:
-    error = simulate_rk2(
-        test_dt,
-        initial_theta1=theta1_ik,
-        initial_theta2=theta2_ik,
-        L1=L1,
-        L2=L2,
-        desired_velocity=desired_velocity,
-        ideal_x=ideal_x,
-        ideal_y=ideal_y,
-    )
-
-    print(f"dt = {test_dt:.4f} s, Error = {error:.8f} mm")
-
-    if previous_error is not None:
-        print(f"Error Reduction Ratio = {previous_error / error:.3f}")
-
-    previous_error = error
-
-print("\n--- Inverse Kinematics Function Test ---")
-
-for x, y in [(1.2, 0.8), (1.3, 0.8)]:
-    th1, th2 = inverse_kinematics(x, y, L1, L2)
-    _, _, actual_x, actual_y = forward_kinematics(
-        th1, th2, L1, L2
-    )
-    error = np.hypot(actual_x - x, actual_y - y)
-
-    print(f"Target: ({x:.3f}, {y:.3f}) m")
-    print(
-        f"Joint Angles: "
-        f"({np.rad2deg(th1):.3f}, "
-        f"{np.rad2deg(th2):.3f}) deg"
-    )
-    print(f"Position Error: {error * 1000:.6f} mm")
+run_inverse_kinematics_test(
+    targets=((1.2, 0.8), (1.3, 0.8)),
+    L1=L1,
+    L2=L2,
+)
 
 # --- Desired Joint Trajectory Generation ---
 

@@ -4,6 +4,27 @@ Python・NumPy・Matplotlibで開発した、平面2リンクロボットアー�
 
 主な実験では、先端を `(1.2, 0.8) m` から `(1.3, 0.8) m` へ1秒間で移動させ、等速軌道と5次多項式軌道の追従誤差・保持誤差を比較しています。
 
+## デモ
+
+![2リンクロボットアームの制御アニメーション](assets/robot_arm_demo.gif)
+
+固定目標 `(1.2, 0.8) m` に対するPID制御応答です。既存のFigure 1と同じ第1関節PID履歴・第2関節の最適化後PID履歴を使い、0〜10秒の動作を再現しています。
+灰色破線の `Target pose` は、逆運動学で求めた目標姿勢を示します。
+
+## 主な実験結果
+
+![軌道追従誤差の比較](assets/trajectory_tracking_comparison.png)
+
+等速軌道と5次多項式軌道をPID＋フィードフォワード制御で追従した、0〜1秒の位置誤差を比較しています。軌道形状に加え、FF用角加速度の計算方法の違いも含む実験結果です。
+
+![P・PD・PID制御の応答比較](assets/pid_response_comparison.png)
+
+共通の簡易動力学モデルと外乱トルク `−0.1 N·m` に対する、第2関節のP・PD・PID応答です。この図のPIDは最適化前の固定ゲインで、上のGIFには第2関節の最適化後の履歴を使用しています。
+
+![Euler法とRK2中点法の終点誤差比較](assets/euler_rk2_comparison.png)
+
+同じ直線運動を `dt = 0.05 s`、20ステップ、1秒間計算した終点誤差です。差が読み取れるよう縦軸を対数目盛とし、各方式の誤差をmmの数値ラベルで示しています。
+
 ## 実装内容
 
 | 項目 | 実装・確認内容 |
@@ -84,10 +105,6 @@ y(t) = 0.8
 
 この実験条件では、5次多項式軌道で追従時・保持時の位置誤差と、1秒時点の先端速度が小さくなりました。この比較には、軌道形状に加え、フィードフォワード用の目標関節角加速度の計算方法（等速側は数値微分、5次側はヤコビ行列の時間微分を用いた計算）の違いも含まれます。本結果は、これらを組み合わせた現在の実験条件における改善を示しています。
 
-![軌道追従誤差の比較](assets/trajectory_tracking_comparison.png)
-
-グラフは0〜1秒の追従中の位置誤差を表示しています。
-
 ## 使用技術
 
 | 技術 | 用途 |
@@ -95,6 +112,7 @@ y(t) = 0.8
 | Python 3 | シミュレーションの実行 |
 | NumPy | 三角関数、行列演算、連立方程式、数値微分、履歴データの集計 |
 | Matplotlib | グラフ描画、アームのアニメーション、比較画像の保存 |
+| Pillow | ポートフォリオ用GIFの書き出し |
 | pathlib（標準ライブラリ） | 画像出力先の作成とパスの操作 |
 
 表の数値の照合には、Python 3.13.17、NumPy 2.5.4、Matplotlib 3.11.2を使用しました。
@@ -107,12 +125,24 @@ WindowsのPowerShellで、プロジェクトのルートディレクトリから
 
 ```powershell
 py -m venv .venv
-.\.venv\Scripts\python.exe -m pip install numpy matplotlib
+.\.venv\Scripts\python.exe -m pip install numpy matplotlib pillow
 $env:MPLBACKEND = "TkAgg"
 .\.venv\Scripts\python.exe main.py
 ```
 
 `main.py` を実行すると、各実験の数値がターミナルに出力され、アニメーションと複数のグラフが表示されます。Step 5-22の比較グラフは `assets/trajectory_tracking_comparison.png` に保存され、同名の画像がある場合は更新されます。
+
+## ポートフォリオ画像の生成
+
+GIFとP・PD・PID／Euler・RK2の2図は、固定した `tests/baseline/reference/` の検証済みデータ（commit `6788e279`）から生成しています。次の独立スクリプトは `main.py` をimportせず、MatplotlibのAggとPillowで書き出します。
+
+```powershell
+.\.venv\Scripts\python.exe scripts\export_portfolio_assets.py
+```
+
+出力先は `assets/` です。`robot_arm_demo.gif`、`pid_response_comparison.png`、`euler_rk2_comparison.png` の3ファイルを生成・更新し、既存の軌道比較PNGと基準データは変更しません。`--output-dir` で別の出力先も指定できます。
+
+GIFは既存のアニメーションと同じ101フレーム・10 fpsで、1周10.1秒の繰り返し再生です。各フレームのリンク座標は既存の `forward_kinematics()` で計算しています。
 
 ## ファイル構成
 
@@ -125,13 +155,18 @@ robot-arm-simulator/
 │   ├── metrics.py               # 関節角度の整定時間
 │   ├── simulation.py            # PID応答、RK2直線運動
 │   └── visualization.py         # アニメーションのフレーム更新
+├── scripts/
+│   └── export_portfolio_assets.py # 固定基準データからGIF・代表グラフを生成
 ├── tests/baseline/
 │   ├── capture.py               # GUIなしで候補データを取得
 │   ├── compare.py               # 固定した基準データとの比較
 │   └── reference/              # モジュール化前の基準データ
 ├── README.md
 └── assets/
-    └── trajectory_tracking_comparison.png
+    ├── trajectory_tracking_comparison.png
+    ├── robot_arm_demo.gif
+    ├── pid_response_comparison.png
+    └── euler_rk2_comparison.png
 ```
 
 `main.py` では、逆運動学の動作確認、Euler直線運動・時間刻み比較、RK2単独・時間刻み比較を5つの実験関数に整理しています。軌道追従・保持などの実験とグラフ描画は引き続き `main.py` にあります。アニメーションは、後から生成される角度履歴をコールバックで取得します。

@@ -8,6 +8,7 @@ from robot_arm.dynamics import (
     coriolis_centrifugal_vector,
     forward_dynamics,
     gravity_vector,
+    integrate_dynamics,
     mass_matrix,
 )
 
@@ -247,6 +248,137 @@ class TestForwardDynamics(unittest.TestCase):
         first = forward_dynamics(0.3, 0.7, 0.4, -0.6, 1.0, 2.0, **self.parameters)
         second = forward_dynamics(0.3, 0.7, 0.4, -0.6, 1.0, 2.0, **self.parameters)
         np.testing.assert_array_equal(first, second)
+
+
+class TestIntegrateDynamics(unittest.TestCase):
+    def setUp(self):
+        # 一様な細い棒モデルのテスト値であり、実機の仕様ではない。
+        self.parameters = dict(
+            L1=1.0, m1=1.0, m2=0.8, lc1=0.5, lc2=0.4,
+            I1=1 / 12, I2=0.8 * 0.8**2 / 12,
+        )
+        self.initial = np.array([0.3, 0.7, 0.4, -0.6])
+
+    def test_euler_returns_four_component_array(self):
+        result = integrate_dynamics(*self.initial, 1.2, -0.4, 0.01, **self.parameters)
+        self.assertIsInstance(result, np.ndarray)
+        self.assertEqual(result.shape, (4,))
+
+    def test_rk2_returns_four_component_array(self):
+        result = integrate_dynamics(
+            *self.initial, 1.2, -0.4, 0.01, method="rk2", **self.parameters
+        )
+        self.assertIsInstance(result, np.ndarray)
+        self.assertEqual(result.shape, (4,))
+
+    def test_rest_without_torque_or_gravity_is_unchanged(self):
+        for method in ("euler", "rk2"):
+            with self.subTest(method=method):
+                result = integrate_dynamics(
+                    0.3, 0.7, 0.0, 0.0, 0.0, 0.0, 0.01,
+                    g=0.0, method=method, **self.parameters
+                )
+                np.testing.assert_array_equal(result, [0.3, 0.7, 0.0, 0.0])
+
+    def test_gravity_compensated_rest_is_unchanged(self):
+        gravity = gravity_vector(0.3, 0.7, L1=1.0, m1=1.0, m2=0.8, lc1=0.5, lc2=0.4)
+        for method in ("euler", "rk2"):
+            with self.subTest(method=method):
+                result = integrate_dynamics(
+                    0.3, 0.7, 0.0, 0.0, gravity[0], gravity[1], 0.01,
+                    method=method, **self.parameters
+                )
+                np.testing.assert_allclose(result, [0.3, 0.7, 0.0, 0.0], rtol=0, atol=1e-14)
+
+    def test_euler_matches_definition(self):
+        alpha = forward_dynamics(
+            *self.initial, 1.2, -0.4, b1=0.2, b2=0.3, g=3.7, **self.parameters
+        )
+        derivative = np.array([0.4, -0.6, alpha[0], alpha[1]])
+        expected = self.initial + 0.02 * derivative
+        actual = integrate_dynamics(
+            *self.initial, 1.2, -0.4, 0.02,
+            b1=0.2, b2=0.3, g=3.7, method="euler", **self.parameters
+        )
+        np.testing.assert_allclose(actual, expected, rtol=0, atol=1e-14)
+
+    def test_rk2_matches_midpoint_definition(self):
+        # 非ゼロの速度・加速度により、中点で角度と角速度が両方変わる。
+        alpha = forward_dynamics(
+            *self.initial, 1.2, -0.4, b1=0.2, b2=0.3, g=3.7, **self.parameters
+        )
+        midpoint = self.initial + 0.01 * np.array([0.4, -0.6, alpha[0], alpha[1]])
+        alpha_mid = forward_dynamics(
+            *midpoint, 1.2, -0.4, b1=0.2, b2=0.3, g=3.7, **self.parameters
+        )
+        expected = self.initial + 0.02 * np.array([
+            midpoint[2], midpoint[3], alpha_mid[0], alpha_mid[1]
+        ])
+        actual = integrate_dynamics(
+            *self.initial, 1.2, -0.4, 0.02,
+            b1=0.2, b2=0.3, g=3.7, method="rk2", **self.parameters
+        )
+        np.testing.assert_allclose(actual, expected, rtol=0, atol=1e-14)
+
+    def test_rejects_invalid_method_and_dt(self):
+        for method in ("invalid", "Euler", "", None):
+            with self.subTest(method=method), self.assertRaises(ValueError):
+                integrate_dynamics(*self.initial, 0.0, 0.0, 0.01, method=method, **self.parameters)
+        for method in ("euler", "rk2"):
+            for dt in (0.0, -0.01, np.nan, np.inf, -np.inf):
+                with self.subTest(method=method, dt=dt), self.assertRaises(ValueError):
+                    integrate_dynamics(*self.initial, 0.0, 0.0, dt, method=method, **self.parameters)
+
+    def test_same_inputs_return_same_result(self):
+        for method in ("euler", "rk2"):
+            with self.subTest(method=method):
+                first = integrate_dynamics(*self.initial, 1.2, -0.4, 0.01, method=method, **self.parameters)
+                second = integrate_dynamics(*self.initial, 1.2, -0.4, 0.01, method=method, **self.parameters)
+                np.testing.assert_array_equal(first, second)
+
+    def free_motion(self, dt, method):
+        """摩擦・モータトルクなし、重力ありで0.2秒間の状態履歴を返す。"""
+        state = self.initial.copy()
+        history = [state.copy()]
+        for _ in range(round(0.2 / dt)):
+            state = integrate_dynamics(*state, 0.0, 0.0, dt, method=method, **self.parameters)
+            history.append(state.copy())
+        return np.array(history)
+
+    def test_time_step_refinement_converges(self):
+        # 微細刻みのRK2解を参照値とし、同じ終端時刻の状態を比較する。
+        reference = self.free_motion(0.000125, "rk2")[-1]
+        for method in ("euler", "rk2"):
+            with self.subTest(method=method):
+                errors = []
+                for dt in (0.01, 0.005, 0.0025):
+                    difference = self.free_motion(dt, method)[-1] - reference
+                    errors.append(np.linalg.norm(difference))
+                # 刻みを半分にした際、Eulerは約1/2、RK2は約1/4に減る。
+                limit = 0.7 if method == "euler" else 0.4
+                self.assertLess(errors[1], limit * errors[0])
+                self.assertLess(errors[2], limit * errors[1])
+
+    def test_time_step_refinement_reduces_energy_error(self):
+        for method in ("euler", "rk2"):
+            with self.subTest(method=method):
+                errors = []
+                for dt in (0.01, 0.005, 0.0025):
+                    energies = []
+                    for state in self.free_motion(dt, method):
+                        theta1, theta2, omega1, omega2 = state
+                        omega = np.array([omega1, omega2])
+                        M = mass_matrix(theta1, theta2, **self.parameters)
+                        kinetic = 0.5 * omega @ M @ omega
+                        # U = m1*g*y重心1 + m2*g*y重心2。高さ0を位置エネルギーの基準とする。
+                        potential = 9.81 * (
+                            (1.0 * 0.5 + 0.8 * 1.0) * np.sin(theta1)
+                            + 0.8 * 0.4 * np.sin(theta1 + theta2)
+                        )
+                        energies.append(kinetic + potential)
+                    errors.append(np.max(np.abs(np.array(energies) - energies[0])))
+                self.assertLess(errors[1], errors[0])
+                self.assertLess(errors[2], errors[1])
 
 
 if __name__ == "__main__":

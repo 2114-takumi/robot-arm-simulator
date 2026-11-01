@@ -135,3 +135,57 @@ def forward_dynamics(
     net_torque = tau - c - gravity - damping
     # solve は逆行列を作らず、連立方程式 M @ qddot = net_torque を解く。
     return np.linalg.solve(M, net_torque)
+
+
+def integrate_dynamics(
+    theta1, theta2, omega1, omega2, tau1, tau2, dt, *,
+    L1, m1, m2, lc1, lc2, I1, I2, b1=0.0, b2=0.0, g=9.81, method="euler"
+):
+    """一定のモータトルクの下で状態を1ステップ数値積分する。
+
+    Args:
+        theta1, theta2: 第1関節角度と第2関節の相対角度 [rad]。
+        omega1, omega2: 各関節角度の時間微分 [rad/s]。
+        tau1, tau2: 1ステップ中一定とするモータトルク [N·m]。
+        dt: 正の有限な時間刻み [s]。
+        L1: 第1リンクの長さ [m]。
+        m1, m2: 各リンクの質量 [kg]。
+        lc1, lc2: 各関節から対応するリンク重心までの距離 [m]。
+        I1, I2: 各リンクの重心まわりの慣性モーメント [kg m^2]。
+        b1, b2: 粘性抵抗係数 [N·m·s/rad]。既定値は 0。
+        g: 重力加速度の大きさ [m/s^2]。既定値は 9.81。
+        method: "euler" は陽的Euler法、"rk2" はRK2中点法。
+
+    Returns:
+        shape=(4,) の numpy.ndarray。
+        [theta1_next, theta2_next, omega1_next, omega2_next]。
+        前半2成分は [rad]、後半2成分は [rad/s]。
+
+    Raises:
+        ValueError: method が未対応、または dt が正の有限値でない場合。
+    """
+    if method not in ("euler", "rk2"):
+        raise ValueError('method must be "euler" or "rk2"')
+    if not np.isfinite(dt) or dt <= 0:
+        raise ValueError("dt must be positive and finite")
+
+    parameters = dict(
+        L1=L1, m1=m1, m2=m2, lc1=lc1, lc2=lc2, I1=I1, I2=I2,
+        b1=b1, b2=b2, g=g,
+    )
+    x = np.array([theta1, theta2, omega1, omega2], dtype=float)
+    # 両手法共通の初期勾配：dx/dt = [omega1, omega2, alpha1, alpha2]。
+    alpha = forward_dynamics(
+        theta1, theta2, omega1, omega2, tau1, tau2, **parameters
+    )
+    k1 = np.array([omega1, omega2, alpha[0], alpha[1]])
+    if method == "euler":
+        return x + dt * k1
+
+    # 中点では角度と角速度の両方を更新する。トルクは初期値のまま。
+    x_mid = x + (dt / 2) * k1
+    alpha_mid = forward_dynamics(
+        x_mid[0], x_mid[1], x_mid[2], x_mid[3], tau1, tau2, **parameters
+    )
+    k2 = np.array([x_mid[2], x_mid[3], alpha_mid[0], alpha_mid[1]])
+    return x + dt * k2

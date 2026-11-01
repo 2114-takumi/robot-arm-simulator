@@ -1,10 +1,10 @@
-"""2リンクロボットの慣性行列の単体テスト。"""
+"""2リンクロボットの慣性行列と速度依存トルクの単体テスト。"""
 
 import unittest
 
 import numpy as np
 
-from robot_arm.dynamics import mass_matrix
+from robot_arm.dynamics import coriolis_centrifugal_vector, mass_matrix
 
 
 class TestMassMatrix(unittest.TestCase):
@@ -64,6 +64,57 @@ class TestMassMatrix(unittest.TestCase):
         first = mass_matrix(0.0, 0.7, **self.parameters)
         second = mass_matrix(np.pi / 2, 0.7, **self.parameters)
         np.testing.assert_array_equal(first, second)
+
+
+class TestCoriolisCentrifugalVector(unittest.TestCase):
+    def setUp(self):
+        # 一様な細い棒モデルのテスト用の値であり、実機の仕様ではない。
+        self.parameters = dict(L1=1.0, m2=0.8, lc2=0.4)
+
+    def test_returns_two_component_array(self):
+        vector = coriolis_centrifugal_vector(0.3, 0.7, 1.0, 2.0, **self.parameters)
+        self.assertIsInstance(vector, np.ndarray)
+        self.assertEqual(vector.shape, (2,))
+
+    def test_zero_velocities_give_zero_torque(self):
+        vector = coriolis_centrifugal_vector(0.3, 0.7, 0.0, 0.0, **self.parameters)
+        np.testing.assert_array_equal(vector, [0.0, 0.0])
+
+    def test_aligned_links_give_nearly_zero_torque(self):
+        for theta2 in (0.0, np.pi):
+            with self.subTest(theta2=theta2):
+                vector = coriolis_centrifugal_vector(
+                    0.3, theta2, 1.0, 2.0, **self.parameters
+                )
+                # sin(pi) の浮動小数点誤差を許容する。
+                np.testing.assert_allclose(vector, [0.0, 0.0], rtol=0, atol=1e-14)
+
+    def test_matches_hand_calculation(self):
+        # theta2=pi/6 より h=0.16。
+        # omega1=2, omega2=3: c1=-0.16*(12+9)=-3.36, c2=0.64。
+        # omega2=-3: c1=-0.16*(-12+9)=0.48, c2=0.64。
+        for omega2, expected in ((3.0, [-3.36, 0.64]), (-3.0, [0.48, 0.64])):
+            with self.subTest(omega2=omega2):
+                vector = coriolis_centrifugal_vector(
+                    0.3, np.pi / 6, 2.0, omega2, **self.parameters
+                )
+                np.testing.assert_allclose(vector, expected, rtol=0, atol=1e-14)
+
+    def test_theta1_does_not_change_vector(self):
+        first = coriolis_centrifugal_vector(0.0, 0.7, 1.0, 2.0, **self.parameters)
+        second = coriolis_centrifugal_vector(np.pi / 2, 0.7, 1.0, 2.0, **self.parameters)
+        np.testing.assert_array_equal(first, second)
+
+    def test_doubling_velocities_quadruples_torque(self):
+        first = coriolis_centrifugal_vector(0.3, 0.7, 1.0, -3.0, **self.parameters)
+        second = coriolis_centrifugal_vector(0.3, 0.7, 2.0, -6.0, **self.parameters)
+        np.testing.assert_allclose(second, 4 * first, rtol=0, atol=1e-14)
+
+    def test_only_first_joint_rotating_at_right_angle(self):
+        vector = coriolis_centrifugal_vector(
+            0.3, np.pi / 2, 1.0, 0.0, **self.parameters
+        )
+        np.testing.assert_allclose(vector, [0.0, 0.32], rtol=0, atol=1e-14)
 
 
 if __name__ == "__main__":

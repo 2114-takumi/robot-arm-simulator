@@ -34,3 +34,29 @@ def mass_matrix(theta1, theta2, *, L1, m1, m2, lc1, lc2, I1, I2):
     M22 = I2 + m2 * lc2**2
 
     return np.array([[M11, M12], [M21, M22]], dtype=float)
+
+
+def coriolis_centrifugal_vector(theta1, theta2, omega1, omega2, *, L1, m2, lc2):
+    """コリオリ力・遠心力による速度依存トルクを計算する。
+
+    Args:
+        theta1: 水平軸を基準とする第1関節角度 [rad]。今回の式には現れない。
+        theta2: 第2関節の相対角度 [rad]。
+        omega1, omega2: 各関節角度の時間微分（角速度）[rad/s]。
+        L1: 第1リンクの長さ [m]。
+        m2: 第2リンクの質量 [kg]。
+        lc2: 第2関節から第2リンク重心までの距離 [m]。
+
+    Returns:
+        C(q, qdot) @ qdot に相当する shape=(2,) の numpy.ndarray [N·m]。
+        運動方程式の左辺に置く [c1, c2] であり、C行列自体は返さない。
+    """
+    # リンク間の姿勢と、第2リンク重心の位置で決まる結合係数。
+    h = m2 * L1 * lc2 * np.sin(theta2)
+
+    # 第1関節の項：角速度の積と、第2関節角速度の2乗に依存する。
+    c1 = -h * (2 * omega1 * omega2 + omega2**2)
+    # 第2関節の項：第1関節角速度の2乗に依存する。
+    c2 = h * omega1**2
+
+    return np.array([c1, c2])

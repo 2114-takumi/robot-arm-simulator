@@ -1,10 +1,10 @@
-"""2リンクロボットの慣性行列と速度依存トルクの単体テスト。"""
+"""2リンクロボットの慣性行列・速度依存トルク・重力項の単体テスト。"""
 
 import unittest
 
 import numpy as np
 
-from robot_arm.dynamics import coriolis_centrifugal_vector, mass_matrix
+from robot_arm.dynamics import coriolis_centrifugal_vector, gravity_vector, mass_matrix
 
 
 class TestMassMatrix(unittest.TestCase):
@@ -115,6 +115,55 @@ class TestCoriolisCentrifugalVector(unittest.TestCase):
             0.3, np.pi / 2, 1.0, 0.0, **self.parameters
         )
         np.testing.assert_allclose(vector, [0.0, 0.32], rtol=0, atol=1e-14)
+
+
+class TestGravityVector(unittest.TestCase):
+    def setUp(self):
+        # 一様な細い棒モデルのテスト用の値であり、実機の仕様ではない。
+        self.parameters = dict(L1=1.0, m1=1.0, m2=0.8, lc1=0.5, lc2=0.4)
+
+    def test_returns_two_component_array(self):
+        vector = gravity_vector(0.3, 0.7, **self.parameters)
+        self.assertIsInstance(vector, np.ndarray)
+        self.assertEqual(vector.shape, (2,))
+
+    def test_horizontal_pose_matches_hand_calculation(self):
+        # g1=(0.5+0.8+0.32)*9.81=15.8922, g2=0.32*9.81=3.1392。
+        vector = gravity_vector(0.0, 0.0, **self.parameters)
+        np.testing.assert_allclose(vector, [15.8922, 3.1392], rtol=0, atol=1e-14)
+
+    def test_vertical_upward_pose_gives_nearly_zero_torque(self):
+        vector = gravity_vector(np.pi / 2, 0.0, **self.parameters)
+        # cos(pi/2) の浮動小数点誤差を許容する。
+        np.testing.assert_allclose(vector, [0.0, 0.0], rtol=0, atol=1e-14)
+
+    def test_zero_gravity_gives_zero_torque(self):
+        vector = gravity_vector(0.3, 0.7, g=0.0, **self.parameters)
+        np.testing.assert_array_equal(vector, [0.0, 0.0])
+
+    def test_doubling_gravity_doubles_torque(self):
+        first = gravity_vector(0.3, 0.7, g=9.81, **self.parameters)
+        second = gravity_vector(0.3, 0.7, g=19.62, **self.parameters)
+        np.testing.assert_allclose(second, 2 * first, rtol=0, atol=1e-14)
+
+    def test_bent_pose_matches_hand_calculation(self):
+        # theta1=pi/3, theta2=-pi/3: cos(theta1)=0.5, cos(theta1+theta2)=1。
+        # g1=1.3*9.81*0.5+3.1392=9.5157, g2=3.1392。
+        # theta1=pi/3, theta2=2*pi/3: cos(theta1+theta2)=-1。
+        # g1=1.3*9.81*0.5-3.1392=3.2373, g2=-3.1392。
+        cases = (
+            (-np.pi / 3, [9.5157, 3.1392]),
+            (2 * np.pi / 3, [3.2373, -3.1392]),
+        )
+        for theta2, expected in cases:
+            with self.subTest(theta2=theta2):
+                vector = gravity_vector(np.pi / 3, theta2, **self.parameters)
+                np.testing.assert_allclose(vector, expected, rtol=0, atol=1e-14)
+
+    def test_same_inputs_return_same_result(self):
+        first = gravity_vector(0.3, 0.7, **self.parameters)
+        second = gravity_vector(0.3, 0.7, **self.parameters)
+        np.testing.assert_array_equal(first, second)
 
 
 if __name__ == "__main__":

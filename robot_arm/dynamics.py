@@ -60,3 +60,32 @@ def coriolis_centrifugal_vector(theta1, theta2, omega1, omega2, *, L1, m2, lc2):
     c2 = h * omega1**2
 
     return np.array([c1, c2])
+
+
+def gravity_vector(theta1, theta2, *, L1, m1, m2, lc1, lc2, g=9.81):
+    """鉛直面内の2リンクロボットの重力項を計算する。
+
+    y軸は上向き、theta1 は水平右向きから測り、theta2 は相対角度とする。
+    重力は下向きに作用し、g はその加速度の正の大きさで指定する。
+
+    Args:
+        theta1: 第1関節角度 [rad]。
+        theta2: 第2関節の相対角度 [rad]。
+        L1: 第1リンクの長さ [m]。
+        m1, m2: 各リンクの質量 [kg]。
+        lc1, lc2: 各関節から対応するリンク重心までの距離 [m]。
+        g: 重力加速度の大きさ [m/s^2]。標準値は 9.81。
+
+    Returns:
+        運動方程式の左辺に置く重力項 [g1, g2]。
+        shape=(2,) の numpy.ndarray で、単位は [N·m]。
+        静止状態で重力を補償するモータトルクと同じ符号を持つ。
+    """
+    # 第1関節には両リンクの重さが寄与する。cos は水平の腕の長さに対応。
+    g1 = (m1 * lc1 + m2 * L1) * g * np.cos(theta1) + m2 * lc2 * g * np.cos(
+        theta1 + theta2
+    )
+    # 第2関節には第2リンクの重さが寄与する。
+    g2 = m2 * lc2 * g * np.cos(theta1 + theta2)
+
+    return np.array([g1, g2])

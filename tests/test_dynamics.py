@@ -1,10 +1,15 @@
-"""2リンクロボットの慣性行列・速度依存トルク・重力項の単体テスト。"""
+"""2リンクロボットの動力学関数の単体テスト。"""
 
 import unittest
 
 import numpy as np
 
-from robot_arm.dynamics import coriolis_centrifugal_vector, gravity_vector, mass_matrix
+from robot_arm.dynamics import (
+    coriolis_centrifugal_vector,
+    forward_dynamics,
+    gravity_vector,
+    mass_matrix,
+)
 
 
 class TestMassMatrix(unittest.TestCase):
@@ -163,6 +168,84 @@ class TestGravityVector(unittest.TestCase):
     def test_same_inputs_return_same_result(self):
         first = gravity_vector(0.3, 0.7, **self.parameters)
         second = gravity_vector(0.3, 0.7, **self.parameters)
+        np.testing.assert_array_equal(first, second)
+
+
+class TestForwardDynamics(unittest.TestCase):
+    def setUp(self):
+        # 一様な細い棒モデルのテスト用の値であり、実機の仕様ではない。
+        self.parameters = dict(
+            L1=1.0, m1=1.0, m2=0.8, lc1=0.5, lc2=0.4,
+            I1=1 / 12, I2=0.8 * 0.8**2 / 12,
+        )
+        self.gravity_parameters = dict(L1=1.0, m1=1.0, m2=0.8, lc1=0.5, lc2=0.4)
+
+    def test_returns_two_component_array(self):
+        acceleration = forward_dynamics(0.3, 0.7, 0.4, -0.6, 1.0, 2.0, **self.parameters)
+        self.assertIsInstance(acceleration, np.ndarray)
+        self.assertEqual(acceleration.shape, (2,))
+
+    def test_gravity_compensation_at_rest_gives_zero_acceleration(self):
+        for theta1, theta2 in ((0.0, 0.0), (0.3, -0.7), (np.pi / 2, 0.0)):
+            with self.subTest(theta1=theta1, theta2=theta2):
+                gravity = gravity_vector(theta1, theta2, **self.gravity_parameters)
+                acceleration = forward_dynamics(
+                    theta1, theta2, 0.0, 0.0, gravity[0], gravity[1], **self.parameters
+                )
+                np.testing.assert_allclose(acceleration, [0.0, 0.0], rtol=0, atol=1e-12)
+
+    def test_inertia_only_equation(self):
+        acceleration = forward_dynamics(
+            0.3, 0.7, 0.0, 0.0, 1.2, -0.4, g=0.0, **self.parameters
+        )
+        M = mass_matrix(0.3, 0.7, **self.parameters)
+        np.testing.assert_allclose(M @ acceleration, [1.2, -0.4], rtol=0, atol=1e-12)
+
+    def test_first_joint_torque_accelerates_both_joints(self):
+        gravity = gravity_vector(0.0, np.pi / 2, **self.gravity_parameters)
+        acceleration = forward_dynamics(
+            0.0, np.pi / 2, 0.0, 0.0, gravity[0] + 1.0, gravity[1],
+            **self.parameters
+        )
+        # 正味トルク [1, 0] でも慣性結合で第2関節が加速する。
+        # 手計算: alpha2=-alpha1, (1.304-64/375)*alpha1=1。
+        np.testing.assert_allclose(
+            acceleration, [15 / 17, -15 / 17], rtol=0, atol=1e-12
+        )
+
+    def test_viscous_damping(self):
+        # 外力・重力なしで、M @ qddot = -[b1*omega1, b2*omega2] を確認。
+        # theta2=0 により速度依存トルクも0になる。
+        M = mass_matrix(0.3, 0.0, **self.parameters)
+        for b1, b2 in ((0.2, 0.0), (0.0, 0.3), (0.2, 0.3)):
+            with self.subTest(b1=b1, b2=b2):
+                acceleration = forward_dynamics(
+                    0.3, 0.0, 0.4, -0.6, 0.0, 0.0,
+                    b1=b1, b2=b2, g=0.0, **self.parameters
+                )
+                expected_torque = [-b1 * 0.4, -b2 * (-0.6)]
+                np.testing.assert_allclose(
+                    M @ acceleration, expected_torque, rtol=0, atol=1e-12
+                )
+
+    def test_satisfies_full_equation_of_motion(self):
+        # 全項が非ゼロになる条件で、計算結果を元の運動方程式に戻す。
+        acceleration = forward_dynamics(
+            0.3, 0.7, 0.4, -0.6, 1.2, -0.4,
+            b1=0.2, b2=0.3, g=3.7, **self.parameters
+        )
+        M = mass_matrix(0.3, 0.7, **self.parameters)
+        c = coriolis_centrifugal_vector(0.3, 0.7, 0.4, -0.6, L1=1.0, m2=0.8, lc2=0.4)
+        gravity = gravity_vector(0.3, 0.7, g=3.7, **self.gravity_parameters)
+        damping = np.array([0.2 * 0.4, 0.3 * (-0.6)])
+        np.testing.assert_allclose(
+            M @ acceleration + c + gravity + damping, [1.2, -0.4],
+            rtol=0, atol=1e-12
+        )
+
+    def test_same_inputs_return_same_result(self):
+        first = forward_dynamics(0.3, 0.7, 0.4, -0.6, 1.0, 2.0, **self.parameters)
+        second = forward_dynamics(0.3, 0.7, 0.4, -0.6, 1.0, 2.0, **self.parameters)
         np.testing.assert_array_equal(first, second)
 
 

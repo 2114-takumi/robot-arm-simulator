@@ -89,3 +89,49 @@ def gravity_vector(theta1, theta2, *, L1, m1, m2, lc1, lc2, g=9.81):
     g2 = m2 * lc2 * g * np.cos(theta1 + theta2)
 
     return np.array([g1, g2])
+
+
+def forward_dynamics(
+    theta1, theta2, omega1, omega2, tau1, tau2, *,
+    L1, m1, m2, lc1, lc2, I1, I2, b1=0.0, b2=0.0, g=9.81
+):
+    """モータトルクから、現在の姿勢・速度における関節角加速度を求める。
+
+    M(q) @ qddot + c(q, qdot) + gravity(q) + B @ qdot = tau を解く。
+    時間積分による角度・角速度の更新は行わない。
+
+    Args:
+        theta1: 水平右向きから測る第1関節角度 [rad]。
+        theta2: 第2関節の相対角度 [rad]。
+        omega1, omega2: 各関節角度の時間微分 [rad/s]。
+        tau1, tau2: 各関節のモータトルク [N·m]。
+        L1: 第1リンクの長さ [m]。
+        m1, m2: 各リンクの質量 [kg]。
+        lc1, lc2: 各関節から対応するリンク重心までの距離 [m]。
+        I1, I2: 各リンクの重心まわりの慣性モーメント [kg m^2]。
+        b1, b2: 対角粘性抵抗行列 B の係数 [N·m·s/rad]。既定値は 0。
+        g: 下向きの重力加速度の大きさ [m/s^2]。既定値は 9.81。
+
+    Returns:
+        関節角加速度 [alpha1, alpha2] [rad/s^2]。
+        shape=(2,) の numpy.ndarray。
+    """
+    # 姿勢に応じた慣性行列を求める。
+    M = mass_matrix(
+        theta1, theta2, L1=L1, m1=m1, m2=m2, lc1=lc1, lc2=lc2, I1=I1, I2=I2
+    )
+    # 速度依存トルクと重力項は既存の関数で計算する。
+    c = coriolis_centrifugal_vector(
+        theta1, theta2, omega1, omega2, L1=L1, m2=m2, lc2=lc2
+    )
+    gravity = gravity_vector(
+        theta1, theta2, L1=L1, m1=m1, m2=m2, lc1=lc1, lc2=lc2, g=g
+    )
+    # 対角行列 B による粘性抵抗を、関節ごとに計算する。
+    damping = np.array([b1 * omega1, b2 * omega2])
+    tau = np.array([tau1, tau2])
+
+    # 運動方程式を整理し、加速度を生む正味のトルクを求める。
+    net_torque = tau - c - gravity - damping
+    # solve は逆行列を作らず、連立方程式 M @ qddot = net_torque を解く。
+    return np.linalg.solve(M, net_torque)

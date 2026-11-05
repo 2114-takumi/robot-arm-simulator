@@ -1,6 +1,8 @@
 # 2リンクロボットアーム制御シミュレーター
 
-Python・NumPy・Matplotlibで開発した、平面2リンクロボットアームの制御シミュレーターです。運動学と関節制御の基礎から、軌道追従、フィードフォワード制御、移動終了後の位置保持までを、数値計算とグラフで確認できます。
+Python・NumPy・Matplotlib・MuJoCoで開発した、平面2リンクロボットアームの制御シミュレーターです。順・逆運動学、P・PD・PID制御から始め、2リンク連成動力学、Computed Torque Control、モデル誤差、トルク飽和、積分制御、anti-windupまで段階的に実装しています。
+
+自作した2リンク動力学モデルと制御器はMuJoCo上でも検証し、5次多項式軌道の追従性能、モデル誤差に対するCTCの感度、CTC+Iによる移動終了後の角度誤差の低減、トルク飽和時のwindupとanti-windupを定量評価しています。さらに、自作動力学シミュレータとMuJoCoのクロスバリデーションを行い、nominal条件では最大関節角度差が約 `1.02e-4 rad` となることを確認しました。
 
 主な実験では、先端を `(1.2, 0.8) m` から `(1.3, 0.8) m` へ1秒間で移動させ、等速軌道と5次多項式軌道の追従誤差・保持誤差を比較しています。
 
@@ -52,7 +54,7 @@ y = L1 sin(θ1) + L2 sin(θ1 + θ2)
 
 ## 動力学モデルと制御
 
-関節ごとに一定の慣性と粘性減衰を持つ、独立した簡易モデルを使用しています。
+`main.py` の従来のPID実験では、関節ごとに一定の慣性と粘性減衰を持つ、独立した簡易モデルを使用しています。以下の式と時間更新はこのモデルの説明です。2リンク連成動力学とCTCについては後述します。
 
 ```text
 角加速度 = (入力トルク − 粘性減衰係数 × 関節角速度) / 慣性
@@ -105,6 +107,206 @@ y(t) = 0.8
 
 この実験条件では、5次多項式軌道で追従時・保持時の位置誤差と、1秒時点の先端速度が小さくなりました。この比較には、軌道形状に加え、フィードフォワード用の目標関節角加速度の計算方法（等速側は数値微分、5次側はヤコビ行列の時間微分を用いた計算）の違いも含まれます。本結果は、これらを組み合わせた現在の実験条件における改善を示しています。
 
+## 2リンク連成動力学とComputed Torque Control
+
+簡易な独立関節モデルに加えて、鉛直平面内で動く2リンクロボットアームの連成動力学モデルを実装しています。
+
+運動方程式は次の形で扱います。
+
+```text
+M(q) q̈ + c(q, q̇) + g(q) + B q̇ = τ
+```
+
+ここで、
+
+- `M(q)`：慣性行列
+- `c(q, q̇)`：コリオリ力・遠心力によるトルク
+- `g(q)`：重力トルク
+- `B q̇`：粘性抵抗
+- `τ`：関節トルク
+
+です。
+
+`robot_arm/dynamics.py` に質量行列、コリオリ・遠心力ベクトル、重力ベクトル、順動力学を実装し、Euler法およびRK2中点法による数値積分を行います。
+
+### Computed Torque Control
+
+非線形な2リンク動力学を補償するため、Computed Torque Control（CTC）を実装しています。
+
+静止目標に対しては、仮想加速度
+
+```text
+v = Kp (q_target - q) - Kd q̇
+```
+
+を計算し、
+
+```text
+τ = M(q) v + c(q, q̇) + g(q)
+```
+
+として関節トルクを求めます。
+
+軌道追従では目標角度、目標角速度、目標角加速度を用いて、
+
+```text
+v =
+q̈_des
++ Kd (q̇_des - q̇)
++ Kp (q_des - q)
+```
+
+としています。
+
+5次多項式軌道を用いることで、開始時・終了時の目標速度と目標加速度がゼロになる滑らかな点-to-点運動を生成しています。
+
+## MuJoCoによる外部物理エンジン検証
+
+自作した2リンク動力学モデルと制御器を、MuJoCoを用いて別の物理エンジン上でも検証しました。
+
+MuJoCoモデルには2つの回転関節を持つ2リンクアームを定義し、`qpos` と `qvel` から関節状態を取得します。制御器が計算した関節トルクは `qfrc_applied` を通じてMuJoCoへ入力します。
+
+検証では以下を実施しました。
+
+- 重力下での自由運動
+- 関節トルクの直接入力
+- Computed Torque Controlによる固定姿勢制御
+- 正弦波軌道追従
+- 5次多項式による滑らかな軌道追従
+- 追従RMSE、最大誤差、最大トルクの定量評価
+- 制御器内部の第2リンク質量 `m2` に対するモデル誤差検証
+- CTC+Iによる移動終了後の角度誤差の低減
+- トルク飽和によるintegrator windupの再現
+- Conditional Integrationによるanti-windup
+- 関節別Conditional Integration
+- Back-calculation
+- 自作動力学モデルとMuJoCoのクロスバリデーション
+
+### Nominal軌道追従
+
+5次多項式で `[0.0, 0.0] rad` から `[0.3, -0.4] rad` へ4秒間で移動させた結果、MuJoCo上のCTCで次の位置追従RMSEを得ました。集計区間は移動後の保持を含む0〜5秒です。
+
+| 指標 | Joint 1 | Joint 2 |
+| --- | --- | --- |
+| Position RMSE | `2.56e-5 rad` | `3.42e-5 rad` |
+| Maximum position error | `3.99e-5 rad` | `5.32e-5 rad` |
+| Final position error | `7.56e-7 rad` | `-1.01e-6 rad` |
+| Maximum torque | `16.03 N·m` | `3.17 N·m` |
+
+この条件では、目標軌道と実際の関節角度はグラフ上でほぼ重なりました。
+
+### モデル誤差に対するCTCの感度
+
+MuJoCo側の実プラントを変更せず、CTC内部で使用する第2リンク質量 `m2` のみを変更してモデル誤差を与えました。
+
+`m2` を20%過大評価した場合、Position RMSEは次のように増加しました。
+
+| 条件 | Joint 1 RMSE | Joint 2 RMSE |
+| --- | --- | --- |
+| Nominal | `2.56e-5 rad` | `3.42e-5 rad` |
+| `m2 +20%` | `0.0218 rad` | `0.0575 rad` |
+
+![MuJoCo trajectory tracking RMSE](assets/mujoco_tracking_rmse_summary.png)
+
+さらに `m2` のモデル誤差を `-50%` から `+50%` まで5%刻みで走査し、モデル誤差が増えるにつれて追従性能が劣化することを確認しました。
+
+今回の条件では、`m2` を過小評価した場合の方が過大評価した場合より追従性能の悪化が大きくなりました。
+
+### CTC+I
+
+モデル誤差によって移動終了後にも残る角度誤差を低減するため、CTCへ積分項を追加しました。
+
+`m2 +20%` の条件では、10秒時点の最終位置誤差が、
+
+```text
+CTC
+Joint 1: -0.0211 rad
+Joint 2: -0.0678 rad
+```
+
+から、
+
+```text
+CTC+I
+Joint 1: -0.00030 rad
+Joint 2: -0.00074 rad
+```
+
+まで低減しました。
+
+![CTC and CTC+I comparison](assets/mujoco_integral_effect_summary.png)
+
+この比較は10秒時点の誤差を評価したもので、漸近的な定常偏差がゼロになることを証明するものではありません。
+
+### トルク飽和とAnti-Windup
+
+関節トルクを
+
+```text
+Joint 1: ±10 N·m
+Joint 2: ±2 N·m
+```
+
+に制限し、CTC+Iを実行することでintegrator windupを再現しました。
+
+飽和中にも通常の積分を続けた場合、最大要求トルクは、
+
+```text
+Joint 1: 121.45 N·m
+Joint 2: 32.84 N·m
+```
+
+まで増加しましたが、MuJoCoへ入力される実トルクはそれぞれ `10 N·m`、`2 N·m` に制限されます。
+
+この条件に対して、
+
+- 全関節同時停止型Conditional Integration
+- 関節別Conditional Integration
+- Back-calculation
+
+を比較しました。
+
+Conditional Integrationでは積分蓄積を抑制できました。また、関節別方式では、飽和していない関節の積分更新を継続できることを確認しました。
+
+Back-calculationでは `Kaw = 0.5, 1, 2, 5, 10` を比較し、今回の条件ではJoint 2のRMSEが比較した候補中で `Kaw = 5` のとき最小となりました。この結果は現在のゲイン・トルク制限・軌道・モデル誤差に依存します。
+
+なお、`±10 N·m`、`±2 N·m` のトルク制限では目標姿勢を保持するために必要な重力補償トルク自体が不足するため、anti-windupだけで追従誤差をゼロにすることはできません。
+
+## 自作動力学モデルとMuJoCoのクロスバリデーション
+
+自作の2リンク動力学モデルとMuJoCoに対して、同じ軌道、同じCTC、同じ時間刻み `0.002 s` を使用して結果を比較しました。
+
+![Custom dynamics and MuJoCo cross-validation](assets/mujoco_cross_validation_summary.png)
+
+### Nominal
+
+自作モデルとMuJoCoの最大関節角度差は、
+
+```text
+Joint 1: 5.71e-5 rad
+Joint 2: 1.02e-4 rad
+```
+
+でした。
+
+### `m2 +20%` のモデル誤差
+
+モデル誤差を与えた場合でも、Position RMSEは、
+
+```text
+Custom simulator
+Joint 1: 0.0218088 rad
+Joint 2: 0.0575167 rad
+
+MuJoCo
+Joint 1: 0.0217984 rad
+Joint 2: 0.0575440 rad
+```
+
+となり、追従性能の劣化傾向までよく一致しました。
+
+この結果から、現在実装している2リンク動力学モデルとMuJoCoモデルは、今回検証した条件において高い整合性を示しました。完全一致ではなく、残る微小差には数値積分法やシミュレーションエンジン内部の実装差が含まれます。
+
 ## 使用技術
 
 | 技術 | 用途 |
@@ -112,6 +314,7 @@ y(t) = 0.8
 | Python 3 | シミュレーションの実行 |
 | NumPy | 三角関数、行列演算、連立方程式、数値微分、履歴データの集計 |
 | Matplotlib | グラフ描画、アームのアニメーション、比較画像の保存 |
+| MuJoCo | 2リンクロボットの物理シミュレーション、自作動力学・制御器の外部検証 |
 | Pillow | ポートフォリオ用GIFの書き出し |
 | pathlib（標準ライブラリ） | 画像出力先の作成とパスの操作 |
 
@@ -119,7 +322,7 @@ y(t) = 0.8
 
 ## 実行方法
 
-Tkinterが利用できるPython 3と、画面表示が可能なデスクトップ環境を用意してください。現在のコードにはTk固有のウィンドウ操作があるため、Matplotlibの `TkAgg` バックエンドを使用します。
+以下は `main.py` の実行手順です。Tkinterが利用できるPython 3と、画面表示が可能なデスクトップ環境を用意してください。`main.py` にはTk固有のウィンドウ操作があるため、Matplotlibの `TkAgg` バックエンドを使用します。
 
 WindowsのPowerShellで、プロジェクトのルートディレクトリから実行する例です。
 
@@ -146,27 +349,54 @@ GIFは既存のアニメーションと同じ101フレーム・10 fpsで、1周1
 
 ## ファイル構成
 
+主なファイルを示します。
+
 ```text
 robot-arm-simulator/
 ├── main.py                      # 実験条件、実験の実行、グラフ作成
 ├── robot_arm/
 │   ├── __init__.py
 │   ├── kinematics.py            # 順・逆運動学、ヤコビ行列と時間微分
+│   ├── dynamics.py              # 2リンク連成動力学、順動力学、数値積分
+│   ├── controllers.py           # PD制御、重力補償
+│   ├── computed_torque.py       # 静止目標へのCTC
+│   ├── computed_torque_integral.py # 積分項を加えたCTC
+│   ├── actuator.py              # 関節トルクの制限
 │   ├── metrics.py               # 関節角度の整定時間
 │   ├── simulation.py            # PID応答、RK2直線運動
 │   └── visualization.py         # アニメーションのフレーム更新
+├── models/
+│   ├── one_link_arm.xml         # MuJoCo用1リンクモデル
+│   └── two_link_arm.xml         # MuJoCo用2リンクモデル
 ├── scripts/
-│   └── export_portfolio_assets.py # 固定基準データからGIF・代表グラフを生成
+│   ├── export_portfolio_assets.py # 固定基準データからGIF・代表グラフを生成
+│   ├── run_coupled_dynamics_demo.py # 連成動力学の検証と物理パラメータ
+│   ├── run_computed_torque_demo.py # PD＋重力補償とCTCの比較
+│   ├── run_mujoco_visualization.py # MuJoCo Viewerでの軌道追従デモ
+│   ├── evaluate_mujoco_trajectory_tracking.py # 軌道追従性能の評価
+│   ├── evaluate_mujoco_model_mismatch.py # モデル誤差の評価
+│   ├── sweep_mujoco_model_mismatch.py # モデル誤差率の走査
+│   ├── evaluate_mujoco_ctc_integral.py # CTC+Iの評価
+│   ├── evaluate_mujoco_windup.py # トルク飽和とwindupの評価
+│   ├── evaluate_mujoco_anti_windup.py # 全関節同時停止型の評価
+│   ├── evaluate_mujoco_per_joint_anti_windup.py # 関節別停止型の評価
+│   ├── evaluate_mujoco_back_calculation.py # Back-calculationの評価
+│   ├── compare_custom_vs_mujoco.py # 自作モデルとMuJoCoの比較
+│   └── summarize_mujoco_validation.py # MuJoCo検証結果の集約
 ├── tests/baseline/
 │   ├── capture.py               # GUIなしで候補データを取得
 │   ├── compare.py               # 固定した基準データとの比較
 │   └── reference/              # モジュール化前の基準データ
+├── outputs/                     # 各実験のCSV・JSON・比較グラフ
 ├── README.md
 └── assets/
     ├── trajectory_tracking_comparison.png
     ├── robot_arm_demo.gif
     ├── pid_response_comparison.png
-    └── euler_rk2_comparison.png
+    ├── euler_rk2_comparison.png
+    ├── mujoco_tracking_rmse_summary.png
+    ├── mujoco_integral_effect_summary.png
+    └── mujoco_cross_validation_summary.png
 ```
 
 `main.py` では、逆運動学の動作確認、Euler直線運動・時間刻み比較、RK2単独・時間刻み比較を5つの実験関数に整理しています。軌道追従・保持などの実験とグラフ描画は引き続き `main.py` にあります。アニメーションは、後から生成される角度履歴をコールバックで取得します。
@@ -186,16 +416,21 @@ robot-arm-simulator/
 
 ## モデルの制約
 
-**このシミュレーションは簡易動力学モデルを使用しており、実機のロボットアームと同じ精度を保証するものではありません。**
+**本プロジェクトはシミュレーションによる制御検証を目的としており、実機ロボットでの性能を保証するものではありません。**
 
-モデルには重力、関節間の動力学的な結合、コリオリ力・遠心力などを含めていません。モータモデルや、関節角度・角速度・トルクの制限も未実装です。表の値は、記載したモデル・ゲイン・時間刻み・軌道条件での数値計算結果です。条件を変えた場合や実機での性能を示すものではありません。
+現在の2リンク動力学モデルには、慣性行列、関節間の動力学的結合、コリオリ力・遠心力、重力、粘性抵抗を含めています。また、外部トルク制限を用いたアクチュエータ飽和も検証しています。
+
+一方で、モータの電気特性、ギア、バックラッシ、クーロン摩擦、センサノイズ、通信遅延、柔軟性、関節角度制限、衝突などは詳細にはモデル化していません。
+
+MuJoCoとのクロスバリデーションでは現在の2リンクモデルと高い一致を確認していますが、これは記載したモデル構造・パラメータ・軌道・時間刻みに対する結果です。実機で同じ追従精度を得られることを意味するものではありません。
 
 ## 今後の改善点
 
-以下は今後の改善候補です。
+今後の候補として、以下を検討しています。
 
-- 残る実験処理・軌道生成・描画の分割を進め、実験条件を設定しやすくする。
-- 重力や関節間干渉を含む動力学モデルへ拡張する。
-- 関節角度・角速度・トルクの制限を取り入れる。
-- ヤコビ行列の特異姿勢付近での数値的な安定性を改善する。
-- 運動学の往復計算や整定時間の判定を自動検証し、時間刻み・ゲインを変えた実験を整理する。
+- MuJoCo上で関節角度制限や接触を含む、より実機に近い条件を追加する。
+- モータ・減速機・摩擦を含むアクチュエータモデルへ拡張する。
+- センサノイズや通信遅延を加え、制御器のロバスト性を評価する。
+- 軌道追従のViewerデモをGIFまたは動画としてポートフォリオ用に整理する。
+- 既存のMuJoCo動力学・固定姿勢CTCテストに加え、5次多項式軌道・モデル誤差・anti-windupの検証結果も回帰テストへ追加し、将来の変更で動力学・制御性能が崩れていないか自動確認できるようにする。
+- 実機ロボットアームへの展開を見据えて、制御ループとシミュレーション部分のインターフェースをさらに分離する。

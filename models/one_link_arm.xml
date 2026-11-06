@@ -1,0 +1,10 @@
+<mujoco model="one_link_arm">
+    <option gravity="0 -9.81 0"/>
+
+    <worldbody>
+        <body name="link1" pos="0 0 0">
+            <joint name="joint1" type="hinge" axis="0 0 1"/>
+            <geom name="link1_geom" type="capsule" fromto="0 0 0 1 0 0" size="0.05" mass="1"/>
+        </body>
+    </worldbody>
+</mujoco>

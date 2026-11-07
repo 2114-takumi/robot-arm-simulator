@@ -4,6 +4,8 @@ Python・NumPy・Matplotlib・MuJoCoで開発した、平面2リンクロボッ�
 
 自作した2リンク動力学モデルと制御器はMuJoCo上でも検証し、5次多項式軌道の追従性能、モデル誤差に対するCTCの感度、CTC+Iによる移動終了後の角度誤差の低減、トルク飽和時のwindupとanti-windupを定量評価しています。さらに、自作動力学シミュレータとMuJoCoのクロスバリデーションを行い、nominal条件では最大関節角度差が約 `1.02e-4 rad` となることを確認しました。
 
+Step 9では、センサの量子化・ノイズ・速度推定、センサと制御の周期分離、遅延、外乱を加えたRealistic Robot Controlの評価まで完了しています。
+
 主な実験では、先端を `(1.2, 0.8) m` から `(1.3, 0.8) m` へ1秒間で移動させ、等速軌道と5次多項式軌道の追従誤差・保持誤差を比較しています。
 
 ## デモ
@@ -307,6 +309,41 @@ Joint 2: 0.0575440 rad
 
 この結果から、現在実装している2リンク動力学モデルとMuJoCoモデルは、今回検証した条件において高い整合性を示しました。完全一致ではなく、残る微小差には数値積分法やシミュレーションエンジン内部の実装差が含まれます。
 
+## Realistic Robot Control（Step 9）
+
+理想的な状態取得と制御に対し、非理想条件が追従性能へ与える影響を段階的に検証しました。エンコーダ量子化、角度測定ノイズ、角度差分による角速度推定、一次Low-pass filter、物理・センサ・制御の周期分離、センサ遅延、外部トルク外乱を実装しています。
+
+Step 9-1で `truth` と `encoder` を比較し、Step 9-2で制御周期と0〜50 msのセンサ遅延、Step 9-3でJoint 2への外乱とJoint 1への連成を評価しました。Step 9-4ではこれらをまとめ、IdealとRealisticを比較しました。
+
+IdealはMuJoCoの真の状態を用いた500 Hz制御で、遅延・外乱はありません。Realisticの代表条件は以下です。
+
+| 項目 | 条件 |
+| --- | --- |
+| Physics | 500 Hz |
+| Sensor / Controller | 各100 Hz |
+| Sensor delay | 10 ms |
+| Encoder | 4096 counts/rev |
+| Angle noise std | 0.0005 rad |
+| Velocity LPF cutoff | 20 Hz |
+| Disturbance | Joint 2へ+1.0 N·m、2.0〜2.2秒（終了時刻は含まない） |
+
+両条件とも既存のCTCと5次多項式軌道を使い、`[0.0, 0.0] rad` から `[0.3, -0.4] rad` へ4秒間で移動します。以下は保持区間を含む0〜5秒の評価で、最終誤差は5秒時点の目標角度−実角度です。ノイズの乱数seedは既存設定の0で、1系列の比較です。
+
+| Metric | Joint 1 | Joint 2 |
+| --- | ---: | ---: |
+| Ideal RMSE | `2.56e-5 rad` | `3.42e-5 rad` |
+| Realistic RMSE | `0.02038 rad` | `0.08226 rad` |
+| Realistic max error | `0.07971 rad` | `0.31975 rad` |
+| Realistic final error | `-0.000332 rad` | `0.000100 rad` |
+
+![Realistic control RMSE comparison](assets/realistic_control_rmse_summary.png)
+
+![Realistic control tracking error](assets/realistic_control_tracking_error.png)
+
+非理想的なセンシング・遅延・外乱により追従性能は低下しましたが、外乱終了後にはフィードバック制御により誤差が減少し、目標姿勢付近へ回復しました。今回の目的はゲイン最適化ではなく、非理想条件の影響を定量評価することです。有限時間のシミュレーション結果であり、漸近的な安定性や実機での性能を保証するものではありません。
+
+Step 9-4をもってRealistic Robot Control編を完了とし、次の開発フェーズはPyTorch／AI・MLへ移行します。
+
 ## 使用技術
 
 | 技術 | 用途 |
@@ -362,6 +399,7 @@ robot-arm-simulator/
 │   ├── computed_torque.py       # 静止目標へのCTC
 │   ├── computed_torque_integral.py # 積分項を加えたCTC
 │   ├── actuator.py              # 関節トルクの制限
+│   ├── sensors.py               # エンコーダ量子化・角度ノイズ・速度推定・LPF
 │   ├── metrics.py               # 関節角度の整定時間
 │   ├── simulation.py            # PID応答、RK2直線運動
 │   └── visualization.py         # アニメーションのフレーム更新
@@ -382,7 +420,11 @@ robot-arm-simulator/
 │   ├── evaluate_mujoco_per_joint_anti_windup.py # 関節別停止型の評価
 │   ├── evaluate_mujoco_back_calculation.py # Back-calculationの評価
 │   ├── compare_custom_vs_mujoco.py # 自作モデルとMuJoCoの比較
-│   └── summarize_mujoco_validation.py # MuJoCo検証結果の集約
+│   ├── summarize_mujoco_validation.py # MuJoCo検証結果の集約
+│   ├── evaluate_mujoco_sensor_model.py # truthとencoderの比較
+│   ├── evaluate_mujoco_rate_delay.py # センサ・制御周期と遅延の評価
+│   ├── evaluate_mujoco_disturbance.py # 外乱と回復の評価
+│   └── evaluate_mujoco_realistic_benchmark.py # IdealとRealisticの比較
 ├── tests/baseline/
 │   ├── capture.py               # GUIなしで候補データを取得
 │   ├── compare.py               # 固定した基準データとの比較
@@ -396,7 +438,9 @@ robot-arm-simulator/
     ├── euler_rk2_comparison.png
     ├── mujoco_tracking_rmse_summary.png
     ├── mujoco_integral_effect_summary.png
-    └── mujoco_cross_validation_summary.png
+    ├── mujoco_cross_validation_summary.png
+    ├── realistic_control_rmse_summary.png
+    └── realistic_control_tracking_error.png
 ```
 
 `main.py` では、逆運動学の動作確認、Euler直線運動・時間刻み比較、RK2単独・時間刻み比較を5つの実験関数に整理しています。軌道追従・保持などの実験とグラフ描画は引き続き `main.py` にあります。アニメーションは、後から生成される角度履歴をコールバックで取得します。
@@ -420,17 +464,18 @@ robot-arm-simulator/
 
 現在の2リンク動力学モデルには、慣性行列、関節間の動力学的結合、コリオリ力・遠心力、重力、粘性抵抗を含めています。また、外部トルク制限を用いたアクチュエータ飽和も検証しています。
 
-一方で、モータの電気特性、ギア、バックラッシ、クーロン摩擦、センサノイズ、通信遅延、柔軟性、関節角度制限、衝突などは詳細にはモデル化していません。
+Step 9では、エンコーダ量子化・角度ノイズ・角速度推定・固定センサ遅延・外乱を簡易モデルとして追加しました。一方で、モータの電気特性、ギア、バックラッシ、クーロン摩擦、実機センサの詳細特性、通信のジッタやパケット欠損、柔軟性、関節角度制限、衝突などは詳細にはモデル化していません。
 
 MuJoCoとのクロスバリデーションでは現在の2リンクモデルと高い一致を確認していますが、これは記載したモデル構造・パラメータ・軌道・時間刻みに対する結果です。実機で同じ追従精度を得られることを意味するものではありません。
 
 ## 今後の改善点
 
-今後の候補として、以下を検討しています。
+Step 9の制御検証を完了したため、次の候補はAI・MLを中心に検討しています。
 
-- MuJoCo上で関節角度制限や接触を含む、より実機に近い条件を追加する。
-- モータ・減速機・摩擦を含むアクチュエータモデルへ拡張する。
-- センサノイズや通信遅延を加え、制御器のロバスト性を評価する。
-- 軌道追従のViewerデモをGIFまたは動画としてポートフォリオ用に整理する。
-- 既存のMuJoCo動力学・固定姿勢CTCテストに加え、5次多項式軌道・モデル誤差・anti-windupの検証結果も回帰テストへ追加し、将来の変更で動力学・制御性能が崩れていないか自動確認できるようにする。
-- 実機ロボットアームへの展開を見据えて、制御ループとシミュレーション部分のインターフェースをさらに分離する。
+- PyTorchによる機械学習の基礎を学ぶ。
+- MuJoCo Cameraによる画像取得を行う。
+- シミュレーションからsynthetic datasetを生成する。
+- 画像から物体位置を推定するvision modelを構築する。
+- Vision → IK → trajectory → controlを統合する。
+- imitation learningを検証する。
+- 将来的なROS 2／C++による実機連携へ展開する。

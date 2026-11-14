@@ -2,6 +2,9 @@
     <option gravity="0 -9.81 0"/>
 
     <worldbody>
+        <body name="target_ball" mocap="true" pos="0.8 0.4 0.08">
+             <geom name="target_ball_geom" type="sphere" size="0.08" rgba="1 0 0 1" contype="0" conaffinity="0"/>
+        </body>
         <body name="link1" pos="0 0 0">
             <inertial pos="0.5 0 0" mass="1" diaginertia="0.0001 0.0833333333 0.0833333333"/>
             <joint name="joint1" type="hinge" axis="0 0 1"/>

@@ -1,5 +1,7 @@
 # Robot Arm Simulator
 
+[![Python CI](https://github.com/2114-takumi/robot-arm-simulator/actions/workflows/python-ci.yml/badge.svg)](https://github.com/2114-takumi/robot-arm-simulator/actions/workflows/python-ci.yml)
+
 MuJoCo上の2リンクロボットアームを題材に、**制御工学・コンピュータビジョン・模倣学習・ROS 2 / MoveIt 2・強化学習**を段階的に統合した個人開発プロジェクトです。
 
 最初は順運動学・逆運動学とPID制御から開始し、その後、2リンク連成動力学、Computed Torque Control、カメラ画像を用いた到達制御、Behavioral Cloning / DAgger、ROS 2 / MoveIt 2との統合、PPOによるトルク制御まで発展させました。

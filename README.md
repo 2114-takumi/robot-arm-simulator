@@ -29,6 +29,7 @@ MuJoCo Robot Node
 /joint_states
   ↓
 TF / RViz
+```
 
 ## Project Overview
 
@@ -415,15 +416,37 @@ docs/ppo_experiment.md
 
 ## Classical Control Results
 
+### 軌道追従誤差：等速軌道 vs 5次多項式軌道
+
 ![Trajectory tracking comparison](assets/trajectory_tracking_comparison.png)
+
+**滑らかな5次多項式軌道を用いることで、等速軌道と比較して追従誤差を大幅に低減しました。**\
+今回の比較には、軌道形状に加えてフィードフォワード用の目標関節角加速度の計算方法の違いも含まれています。
+
+### 制御応答：P制御 vs PD制御 vs PID制御
 
 ![PID response comparison](assets/pid_response_comparison.png)
 
+**同じ動力学モデルと外乱条件で、P・PD・PID制御による第2関節の応答を比較しました。振動の抑制や目標角度に対する残留誤差など、各制御方式の特徴を確認できます。**
+
+### 数値積分：Euler法 vs RK2中点法
+
 ![Euler vs RK2](assets/euler_rk2_comparison.png)
+
+**同じ運動をEuler法とRK2中点法で数値積分し、終点誤差を比較しました。中点で状態を再評価するRK2により、今回の条件ではEuler法より大幅に高い精度を確認しました。**
+
+### MuJoCoでの軌道追従誤差：モデル誤差の影響
 
 ![MuJoCo tracking RMSE](assets/mujoco_tracking_rmse_summary.png)
 
+**MuJoCo上でCTCによる軌道追従を評価し、モデルが一致する条件では小さな追従誤差を確認しました。一方、制御器内部のリンク質量に誤差を与えると、関節角度のRMSEが増加しました。**
+
+### モデル誤差下でのCTC vs CTC+I
+
 ![CTC and CTC+I comparison](assets/mujoco_integral_effect_summary.png)
+
+**モデル誤差下でCTCに積分補償を加えることで、移動終了後に残る関節角度誤差を大幅に低減しました。**\
+この比較では、第2リンク質量を20%過大評価した条件で、10秒時点の関節角度誤差を評価しています。
 
 ---
 

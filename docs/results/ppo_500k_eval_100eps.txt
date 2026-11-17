@@ -1,0 +1,108 @@
+Episode 01: goal=[ 0.04601444 -0.49434194], final_q=[ 0.04566608 -0.5315509 ], final_error=0.0372, min_error=0.0106, success=True
+Episode 02: goal=[-0.67808217 -0.4782556 ], final_q=[-0.6634257  -0.48605581], final_error=0.0166, min_error=0.0166, success=True
+Episode 03: goal=[-0.2605901   0.08783124], final_q=[-0.2792244   0.05680846], final_error=0.0362, min_error=0.0249, success=True
+Episode 04: goal=[0.40338057 0.3569566 ], final_q=[0.40688584 0.37441911], final_error=0.0178, min_error=0.0144, success=True
+Episode 05: goal=[0.19307809 0.5393484 ], final_q=[0.17110969 0.55040561], final_error=0.0246, min_error=0.0246, success=True
+Episode 06: goal=[0.5356684 0.7627552], final_q=[0.55415658 0.86667478], final_error=0.1056, min_error=0.0810, success=False
+Episode 07: goal=[ 0.47963178 -0.26392776], final_q=[ 0.49261851 -0.29245883], final_error=0.0313, min_error=0.0312, success=True
+Episode 08: goal=[0.14211006 0.63253945], final_q=[0.11216314 0.6458302 ], final_error=0.0328, min_error=0.0328, success=True
+Episode 09: goal=[0.7731012 0.5508411], final_q=[0.84818717 0.67010458], final_error=0.1409, min_error=0.0723, success=False
+Episode 10: goal=[0.5213534  0.17436397], final_q=[0.53939658 0.18493293], final_error=0.0209, min_error=0.0025, success=True
+Episode 11: goal=[0.55811125 0.39383176], final_q=[0.58289398 0.43850422], final_error=0.0511, min_error=0.0295, success=True
+Episode 12: goal=[-0.6355067  -0.16373833], final_q=[-0.63213962 -0.18643939], final_error=0.0229, min_error=0.0229, success=True
+Episode 13: goal=[-0.01003774  0.26430005], final_q=[-0.03199396  0.24292526], final_error=0.0306, min_error=0.0306, success=True
+Episode 14: goal=[ 0.33938158 -0.4167671 ], final_q=[ 0.34574708 -0.45428169], final_error=0.0381, min_error=0.0381, success=True
+Episode 15: goal=[ 0.01822996 -0.42725855], final_q=[ 0.01614822 -0.46466232], final_error=0.0375, min_error=0.0107, success=True
+Episode 16: goal=[-0.7512168  -0.56542736], final_q=[-0.72779338 -0.56324199], final_error=0.0235, min_error=0.0235, success=True
+Episode 17: goal=[-0.13606182 -0.02552347], final_q=[-0.15063809 -0.05798973], final_error=0.0356, min_error=0.0356, success=True
+Episode 18: goal=[-0.6902142  -0.13323568], final_q=[-0.68290713 -0.15501932], final_error=0.0230, min_error=0.0230, success=True
+Episode 19: goal=[0.04518696 0.28237993], final_q=[0.02452691 0.26432656], final_error=0.0274, min_error=0.0231, success=True
+Episode 20: goal=[-0.460376   0.3277842], final_q=[-0.48139521  0.29542219], final_error=0.0386, min_error=0.0256, success=True
+Episode 21: goal=[-0.6579678  -0.10541102], final_q=[-0.65411236 -0.12903138], final_error=0.0239, min_error=0.0239, success=True
+Episode 22: goal=[-0.5205563   0.72446984], final_q=[-0.55159451  0.6833916 ], final_error=0.0515, min_error=0.0276, success=True
+Episode 23: goal=[0.02257279 0.38814723], final_q=[-0.00318943  0.37398587], final_error=0.0294, min_error=0.0294, success=True
+Episode 24: goal=[ 0.5169637 -0.3717815], final_q=[ 0.5324424  -0.40394607], final_error=0.0357, min_error=0.0355, success=True
+Episode 25: goal=[ 0.19796564 -0.73276925], final_q=[ 0.20392625 -0.7664337 ], final_error=0.0342, min_error=0.0342, success=True
+Episode 26: goal=[-0.37018752  0.22957577], final_q=[-0.39170538  0.19879783], final_error=0.0376, min_error=0.0245, success=True
+Episode 27: goal=[ 0.11214793 -0.01397205], final_q=[ 0.10330111 -0.04287142], final_error=0.0302, min_error=0.0302, success=True
+Episode 28: goal=[0.64931417 0.78701746], final_q=[0.69354323 0.92497874], final_error=0.1449, min_error=0.0980, success=False
+Episode 29: goal=[ 0.5408388 -0.0407863], final_q=[ 0.55964802 -0.05007776], final_error=0.0210, min_error=0.0157, success=True
+Episode 30: goal=[-0.21034405 -0.01541071], final_q=[-0.22571947 -0.04770015], final_error=0.0358, min_error=0.0273, success=True
+Episode 31: goal=[0.7853024 0.3114122], final_q=[0.85366422 0.38446733], final_error=0.1001, min_error=0.0371, success=True
+Episode 32: goal=[-0.48246077  0.3358996 ], final_q=[-0.50247232  0.30308298], final_error=0.0384, min_error=0.0273, success=True
+Episode 33: goal=[ 0.16233028 -0.22439572], final_q=[ 0.15977876 -0.25965216], final_error=0.0353, min_error=0.0327, success=True
+Episode 34: goal=[0.08849397 0.61734104], final_q=[0.05568844 0.62303664], final_error=0.0333, min_error=0.0191, success=True
+Episode 35: goal=[ 0.5498448 -0.5745356], final_q=[ 0.56765095 -0.61142238], final_error=0.0410, min_error=0.0404, success=True
+Episode 36: goal=[ 0.03275516 -0.7918167 ], final_q=[ 0.03803631 -0.81797108], final_error=0.0267, min_error=0.0267, success=True
+Episode 37: goal=[-0.36830267 -0.2057172 ], final_q=[-0.37647557 -0.23605421], final_error=0.0314, min_error=0.0285, success=True
+Episode 38: goal=[0.12694246 0.40929523], final_q=[0.10547667 0.40374251], final_error=0.0222, min_error=0.0222, success=True
+Episode 39: goal=[0.09159323 0.19668095], final_q=[0.07585514 0.17662644], final_error=0.0255, min_error=0.0255, success=True
+Episode 40: goal=[0.31792173 0.61705667], final_q=[0.30556696 0.6536853 ], final_error=0.0387, min_error=0.0303, success=True
+Episode 41: goal=[-0.4682784  0.5286647], final_q=[-0.49581745  0.49375544], final_error=0.0445, min_error=0.0263, success=True
+Episode 42: goal=[0.26167548 0.00191506], final_q=[ 0.25930603 -0.0211312 ], final_error=0.0232, min_error=0.0207, success=True
+Episode 43: goal=[-0.50462824  0.13536903], final_q=[-0.51744689  0.10462009], final_error=0.0333, min_error=0.0272, success=True
+Episode 44: goal=[-0.57235366  0.14430907], final_q=[-0.58100937  0.11374777], final_error=0.0318, min_error=0.0277, success=True
+Episode 45: goal=[0.4470162  0.46993595], final_q=[0.45466494 0.50757696], final_error=0.0384, min_error=0.0304, success=True
+Episode 46: goal=[0.4072816  0.07699031], final_q=[0.41389328 0.06757519], final_error=0.0115, min_error=0.0112, success=True
+Episode 47: goal=[-0.30031   -0.1237298], final_q=[-0.31197211 -0.15591397], final_error=0.0342, min_error=0.0299, success=True
+Episode 48: goal=[ 0.45378482 -0.36746037], final_q=[ 0.46537246 -0.40137014], final_error=0.0358, min_error=0.0358, success=True
+Episode 49: goal=[ 0.34742466 -0.6398126 ], final_q=[ 0.35604086 -0.67780321], final_error=0.0390, min_error=0.0390, success=True
+Episode 50: goal=[-0.12037547  0.04151614], final_q=[-0.13688799  0.01052161], final_error=0.0351, min_error=0.0351, success=True
+Episode 51: goal=[-0.33048102  0.4456582 ], final_q=[-0.36128098  0.41635002], final_error=0.0425, min_error=0.0183, success=True
+Episode 52: goal=[0.34580418 0.01325313], final_q=[ 0.34836951 -0.0049205 ], final_error=0.0184, min_error=0.0184, success=True
+Episode 53: goal=[ 0.6277354  -0.55244005], final_q=[ 0.65095667 -0.5873905 ], final_error=0.0420, min_error=0.0402, success=True
+Episode 54: goal=[ 0.48067996 -0.2640885 ], final_q=[ 0.4937743  -0.29257174], final_error=0.0313, min_error=0.0312, success=True
+Episode 55: goal=[-0.16279586 -0.5455192 ], final_q=[-0.1634572 -0.5760905], final_error=0.0306, min_error=0.0306, success=True
+Episode 56: goal=[-0.7988971  -0.21014863], final_q=[-0.77870934 -0.22504591], final_error=0.0251, min_error=0.0251, success=True
+Episode 57: goal=[0.3932196  0.46257588], final_q=[0.39398646 0.49124787], final_error=0.0287, min_error=0.0254, success=True
+Episode 58: goal=[-0.19897583  0.36962497], final_q=[-0.22841016  0.34417063], final_error=0.0389, min_error=0.0241, success=True
+Episode 59: goal=[-0.02280686  0.62276196], final_q=[-0.06132319  0.61733072], final_error=0.0389, min_error=0.0389, success=True
+Episode 60: goal=[0.14336224 0.71324116], final_q=[0.10957712 0.73425074], final_error=0.0398, min_error=0.0398, success=True
+Episode 61: goal=[-0.4267992 -0.6464398], final_q=[-0.42043732 -0.65944576], final_error=0.0145, min_error=0.0145, success=True
+Episode 62: goal=[-0.504866  0.066962], final_q=[-0.51579994  0.03695043], final_error=0.0319, min_error=0.0273, success=True
+Episode 63: goal=[ 0.6494973  -0.74554044], final_q=[ 0.6748781  -0.78199311], final_error=0.0444, min_error=0.0417, success=True
+Episode 64: goal=[-0.07287187  0.16693188], final_q=[-0.09284266  0.14006473], final_error=0.0335, min_error=0.0192, success=True
+Episode 65: goal=[-0.61187494 -0.3693556 ], final_q=[-0.60501339 -0.3860452 ], final_error=0.0180, min_error=0.0180, success=True
+Episode 66: goal=[-0.01842021 -0.6514284 ], final_q=[-0.01628627 -0.68295328], final_error=0.0316, min_error=0.0313, success=True
+Episode 67: goal=[0.47009614 0.3408041 ], final_q=[0.48192206 0.36493998], final_error=0.0269, min_error=0.0169, success=True
+Episode 68: goal=[ 0.05146334 -0.21364173], final_q=[ 0.04552325 -0.24949948], final_error=0.0363, min_error=0.0325, success=True
+Episode 69: goal=[-0.4037758 -0.5650529], final_q=[-0.40062265 -0.58390942], final_error=0.0191, min_error=0.0191, success=True
+Episode 70: goal=[0.52155834 0.14103006], final_q=[0.53959241 0.14798159], final_error=0.0193, min_error=0.0193, success=True
+Episode 71: goal=[ 0.311841   -0.08690506], final_q=[ 0.3135336  -0.11279099], final_error=0.0259, min_error=0.0259, success=True
+Episode 72: goal=[-0.2850238  0.5235524], final_q=[-0.3203659   0.49671733], final_error=0.0444, min_error=0.0090, success=True
+Episode 73: goal=[0.04681012 0.02036891], final_q=[ 0.03480117 -0.00873146], final_error=0.0315, min_error=0.0011, success=True
+Episode 74: goal=[-0.11237551 -0.0529104 ], final_q=[-0.12582006 -0.08585148], final_error=0.0356, min_error=0.0078, success=True
+Episode 75: goal=[ 0.01738399 -0.21993877], final_q=[ 0.01080131 -0.25596774], final_error=0.0366, min_error=0.0326, success=True
+Episode 76: goal=[-0.47552982 -0.253058  ], final_q=[-0.47909026 -0.27925719], final_error=0.0264, min_error=0.0255, success=True
+Episode 77: goal=[0.3485243 0.3317631], final_q=[0.34664019 0.34028171], final_error=0.0087, min_error=0.0085, success=True
+Episode 78: goal=[0.7576638 0.3947376], final_q=[0.82319804 0.47812709], final_error=0.1061, min_error=0.0464, success=False
+Episode 79: goal=[-0.05671386 -0.39914796], final_q=[-0.06038174 -0.43550539], final_error=0.0365, min_error=0.0343, success=True
+Episode 80: goal=[0.087288   0.08376431], final_q=[0.07487921 0.05828239], final_error=0.0283, min_error=0.0198, success=True
+Episode 81: goal=[ 0.7968646  -0.22961642], final_q=[ 0.84348883 -0.23494342], final_error=0.0469, min_error=0.0216, success=True
+Episode 82: goal=[ 0.6771992  -0.46245697], final_q=[ 0.70503401 -0.49269551], final_error=0.0411, min_error=0.0374, success=True
+Episode 83: goal=[-0.06937623 -0.42165253], final_q=[-0.07265555 -0.45756687], final_error=0.0361, min_error=0.0341, success=True
+Episode 84: goal=[ 0.15018542 -0.21678267], final_q=[ 0.14708894 -0.25198006], final_error=0.0353, min_error=0.0353, success=True
+Episode 85: goal=[ 0.24622081 -0.6488936 ], final_q=[ 0.252046  -0.6859803], final_error=0.0375, min_error=0.0374, success=True
+Episode 86: goal=[ 0.21505493 -0.56758726], final_q=[ 0.2191075  -0.60584865], final_error=0.0385, min_error=0.0380, success=True
+Episode 87: goal=[0.15356559 0.54184353], final_q=[0.12853923 0.54870471], final_error=0.0259, min_error=0.0050, success=True
+Episode 88: goal=[0.05356738 0.49829635], final_q=[0.02440073 0.49243653], final_error=0.0297, min_error=0.0297, success=True
+Episode 89: goal=[ 0.525413   -0.54478705], final_q=[ 0.5416094  -0.58165576], final_error=0.0403, min_error=0.0400, success=True
+Episode 90: goal=[ 0.51284873 -0.38778234], final_q=[ 0.52803504 -0.42071863], final_error=0.0363, min_error=0.0361, success=True
+Episode 91: goal=[-0.62642276  0.78053594], final_q=[-0.64808062  0.7310804 ], final_error=0.0540, min_error=0.0407, success=True
+Episode 92: goal=[0.52410847 0.6347106 ], final_q=[0.54241212 0.71235164], final_error=0.0798, min_error=0.0597, success=False
+Episode 93: goal=[ 0.06846351 -0.64447826], final_q=[ 0.07116722 -0.67863472], final_error=0.0343, min_error=0.0343, success=True
+Episode 94: goal=[-0.24299978  0.5915831 ], final_q=[-0.28231053  0.56800966], final_error=0.0458, min_error=0.0085, success=True
+Episode 95: goal=[-0.7364664  -0.52806145], final_q=[-0.71545239 -0.52932045], final_error=0.0211, min_error=0.0211, success=True
+Episode 96: goal=[ 0.23710358 -0.20855522], final_q=[ 0.23698576 -0.24209108], final_error=0.0335, min_error=0.0335, success=True
+Episode 97: goal=[ 0.1947582  -0.29854408], final_q=[ 0.19450841 -0.33529484], final_error=0.0368, min_error=0.0349, success=True
+Episode 98: goal=[0.79721785 0.20170826], final_q=[0.8629873  0.25700893], final_error=0.0859, min_error=0.0233, success=True
+Episode 99: goal=[0.35568574 0.6696691 ], final_q=[0.34633034 0.71974733], final_error=0.0509, min_error=0.0486, success=True
+Episode 100: goal=[ 0.11740646 -0.44920596], final_q=[ 0.11751776 -0.48759344], final_error=0.0384, min_error=0.0384, success=True
+
+==============================
+PPO evaluation
+==============================
+Success rate: 95.0%
+Mean final error: 0.0380 rad
+Median final error: 0.0352 rad
+Mean minimum error: 0.0289 rad

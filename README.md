@@ -4,6 +4,32 @@ MuJoCo上の2リンクロボットアームを題材に、**制御工学・コ�
 
 最初は順運動学・逆運動学とPID制御から開始し、その後、2リンク連成動力学、Computed Torque Control、カメラ画像を用いた到達制御、Behavioral Cloning / DAgger、ROS 2 / MoveIt 2との統合、PPOによるトルク制御まで発展させました。
 
+## Demo: ROS 2 / MoveIt 2 → MuJoCo
+
+![ROS 2 MoveIt 2 to MuJoCo demo](assets/ros2_moveit_mujoco_demo.gif)
+
+RVizで指定した目標関節角に対してMoveIt 2が軌道を生成し、
+`FollowJointTrajectory` Actionを自作Bridge Nodeで受信します。
+Bridgeは軌道点を `/joint_command` へ変換し、
+PD制御と重力・バイアス補償によってMuJoCoの2リンクアームを追従させます。
+
+```text
+RViz
+  ↓
+MoveIt 2 / OMPL
+  ↓
+FollowJointTrajectory
+  ↓
+Custom Trajectory Bridge
+  ↓
+/joint_command
+  ↓
+MuJoCo Robot Node
+  ↓
+/joint_states
+  ↓
+TF / RViz
+
 ## Project Overview
 
 このプロジェクトでは、同じ2リンクロボットアームに対して複数の制御・学習手法を実装し、それぞれの特徴を比較しています。

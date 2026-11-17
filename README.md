@@ -31,6 +31,111 @@ MuJoCo Robot Node
 TF / RViz
 ```
 
+## Key Results
+
+| Experiment | Result |
+| --- | --- |
+| MuJoCo CTC tracking | Position RMSE — Joint 1: `2.56e-5 rad`, Joint 2: `3.42e-5 rad` |
+| Vision Behavioral Cloning | 50 episodes success rate: **50%** |
+| DAgger Round 1 | 50 episodes success rate: **76%** |
+| PPO | 100 deterministic episodes; success rate: **95.0%**; mean final error: `0.0380 rad`; median final error: `0.0352 rad`; mean minimum error: `0.0289 rad` |
+
+詳細は後半の各実験セクションおよび [docs/ppo_experiment.md](docs/ppo_experiment.md) を参照してください。
+
+## Quick Start
+
+以下は、cloneしたリポジトリのルートディレクトリを起点に実行します。
+
+### A. Python / MuJoCo
+
+Linux / WSL（Python 3とvenvが必要）：
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+Windows PowerShellでは、最初の2行を次に置き換えてください。pipの2行は共通です。
+
+```powershell
+py -3 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
+基本の運動学・PID制御デモ（MatplotlibのGUIを使用）：
+
+```bash
+python main.py
+```
+
+MuJoCoのCTC軌道追従評価（checkpoint不要、結果画像は `outputs/step_8_22/` に保存）：
+
+```bash
+python scripts/evaluate_mujoco_trajectory_tracking.py
+```
+
+`requirements.txt` は制御・Vision・学習・テストで使用するPython依存をまとめています。プロジェクト全体の固定バージョン環境は定義されていないため、厳密なバージョン指定は行っていません。
+
+### B. PPO
+
+AのPython環境で初回学習（100k steps）を実行します。
+
+```bash
+python train_ppo.py
+```
+
+保存先は `models_rl/ppo_robot_arm.zip` です。一方、評価コードは **`models_rl/ppo_robot_arm_500k.zip` を読み込みます**。checkpoint（`models_rl/*.zip`）はGit管理対象外なので、clone直後や初回学習だけでは次の評価は実行できません。
+
+500k checkpointを用意した後の評価（100 deterministic episodes）：
+
+```bash
+python evaluate_ppo.py
+```
+
+初回学習から評価用checkpointを作る場合は、初回学習の完了後に以下を順に実行します。継続学習コードの入力名に合わせて100kモデルをコピーし、300k相当、500k相当へ学習を進めます。
+
+```bash
+python -c "import shutil; shutil.copyfile('models_rl/ppo_robot_arm.zip', 'models_rl/ppo_robot_arm_100k.zip')"
+python continue_ppo.py
+python continue_ppo_500k.py
+```
+
+上記のKey Resultsは既存実験の記録であり、再学習による数値の一致を保証するものではありません。
+
+### C. ROS 2 / MoveIt 2 → MuJoCo
+
+対象は **Ubuntu 24.04 / WSL2、ROS 2 Jazzy、MoveIt 2、colcon** です。RVizを表示できるGUI環境が必要です。ROS 2 Jazzyのインストールと `rosdep init` が済んでいることを前提に、Aの環境を有効化していない新しいUbuntuターミナルで実行してください。
+
+**起動前のパス確認：** 現在の [mujoco_joint_state_publisher.py](ros2_ws/src/robot_arm_ros/robot_arm_ros/mujoco_joint_state_publisher.py) の `model_path` は `/mnt/c/Users/cfca5399/Projects/personal/python/robot-arm-simulator/models/two_link_arm.xml` に固定されています。別の場所にcloneした場合は、この変数を実際の `models/two_link_arm.xml` の絶対パスへ合わせてからビルドする必要があります。
+
+ROS依存はapt / rosdepで導入します。`rclpy`、メッセージ型、MoveIt、launch、ament等は `requirements.txt` に含めていません。
+
+```bash
+source /opt/ros/jazzy/setup.bash
+sudo apt update
+sudo apt install ros-jazzy-moveit python3-colcon-common-extensions python3-rosdep python3-venv
+cd ros2_ws
+rosdep update
+rosdep install --from-paths src --ignore-src --rosdistro jazzy -y
+```
+
+MuJoCo用にROS専用の仮想環境を作成します。ROSのシステムPythonとapt導入済みパッケージを使用し、Aの学習用環境とは分離します（[ROS 2のPython環境ガイド](https://github.com/ros2/ros2_documentation/blob/jazzy/source/How-To-Guides/Using-Python-Packages.rst)）。
+
+```bash
+/usr/bin/python3 -m venv --system-site-packages .venv
+source .venv/bin/activate
+touch .venv/COLCON_IGNORE
+python -m pip install mujoco numpy
+python -c "import rclpy, mujoco, numpy"
+python /usr/bin/colcon build --symlink-install
+source install/setup.bash
+ros2 launch robot_arm_moveit_config mujoco_moveit.launch.py
+```
+
+`python /usr/bin/colcon` は仮想環境のPythonでビルドするための指定です。launchは `robot_arm_ros` のMuJoCoノードと軌道Bridge、MoveItの `move_group`、TF、RVizを起動します。以後、新しいターミナルで起動するときも、ROS本体、`ros2_ws/.venv/bin/activate`、`ros2_ws/install/setup.bash` をこの順でsourceしてください。
+
 ## Project Overview
 
 このプロジェクトでは、同じ2リンクロボットアームに対して複数の制御・学習手法を実装し、それぞれの特徴を比較しています。
@@ -144,7 +249,7 @@ Reward
 
 ---
 
-# Key Results
+# Experiment Details
 
 ## 1. Classical Control and MuJoCo Validation
 
@@ -400,11 +505,7 @@ Mean minimum error:  0.0289 rad
 
 平均最終誤差 `0.0380 rad` は約 `2.18°` です。
 
-詳細：
-
-```text
-docs/ppo_experiment.md
-```
+詳細：[docs/ppo_experiment.md](docs/ppo_experiment.md)
 
 ---
 
@@ -484,6 +585,7 @@ robot-arm-simulator/
 ├── continue_ppo.py
 ├── continue_ppo_500k.py
 ├── evaluate_ppo.py
+├── requirements.txt
 │
 └── main.py
 ```

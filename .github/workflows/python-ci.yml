@@ -1,0 +1,73 @@
+name: Python CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python-checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      MPLBACKEND: Agg
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      # Compile only: do not import or execute training, GUI, or camera scripts.
+      # ros2_ws is intentionally excluded from all checks.
+      - name: Check Python syntax
+        run: |
+          python -m compileall -q robot_arm scripts tests main.py \
+            robot_arm_rl_env.py train_ppo.py continue_ppo.py \
+            continue_ppo_500k.py evaluate_ppo.py
+
+      - name: Smoke test MuJoCo and Gymnasium without rendering
+        run: |
+          python - <<'PY'
+          import numpy as np
+          from robot_arm_rl_env import RobotArmRLEnv
+
+          env = RobotArmRLEnv()
+          try:
+              obs, _ = env.reset(seed=0)
+              assert obs.shape == env.observation_space.shape == (6,)
+              assert np.isfinite(obs).all()
+              env.action_space.seed(0)
+
+              for _ in range(10):
+                  obs, reward, terminated, truncated, _ = env.step(
+                      env.action_space.sample()
+                  )
+                  assert obs.shape == (6,)
+                  assert np.isfinite(obs).all()
+                  assert np.isfinite(reward)
+                  if terminated or truncated:
+                      obs, _ = env.reset()
+                      assert obs.shape == (6,)
+                      assert np.isfinite(obs).all()
+          finally:
+              env.close()
+          print('MuJoCo/Gymnasium smoke test passed (10 steps).')
+          PY
+
+      # This file only exercises NumPy-based dynamics; no GUI or experiment runs.
+      - name: Run selected unit tests
+        run: python -m pytest -q tests/test_dynamics.py

@@ -1,0 +1,22 @@
+# Control, simulation, and plotting
+numpy
+matplotlib
+mujoco
+
+# Vision and image/GIF export (cv2 -> opencv-python; PIL -> Pillow)
+opencv-python
+Pillow
+torch
+
+# Reinforcement learning
+gymnasium
+stable-baselines3
+# Required by model.learn(progress_bar=True) in the PPO training scripts
+tqdm
+rich
+
+# Test runner; ROS lint tests also require ament packages via ROS / rosdep
+pytest
+
+# ROS dependencies and ROS-only packaging tools are managed separately.
+# No project-wide pinned environment is defined; versions are not pinned here.

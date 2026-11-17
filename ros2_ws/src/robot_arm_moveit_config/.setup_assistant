@@ -1,0 +1,25 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: robot_arm_ros
+    relative_path: urdf/two_link_arm.urdf
+  srdf:
+    relative_path: config/two_link_arm.srdf
+  package_settings:
+    author_name: Takumi Sakamaki
+    author_email: 219698899+2114-takumi@users.noreply.github.com
+    generated_timestamp: 1794822651
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
